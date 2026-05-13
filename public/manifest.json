@@ -1,0 +1,10 @@
+{
+  "name": "SANJHA — Village Farms as One",
+  "short_name": "SANJHA",
+  "description": "AI-powered collective farming intelligence for rural India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07120e",
+  "theme_color": "#16a34a",
+  "lang": "en"
+}
