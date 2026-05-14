@@ -61,8 +61,8 @@ export default function AdminPage() {
             <CardTitle>{t("admin_trend_title")}</CardTitle>
             <CardDescription>{t("admin_trend_desc")}</CardDescription>
           </CardHeader>
-          <CardContent className="h-80 min-h-[20rem] w-full min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
+          <CardContent className="w-full min-w-0">
+            <ResponsiveContainer width="100%" height={320}>
               <BarChart data={demandTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.15)" />
                 <XAxis dataKey="m" stroke="rgba(148,163,184,0.5)" />

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,18 +40,24 @@ const nav = [
 
 function useOnlineSync(): SyncStatus {
   const [status, setStatus] = useState<SyncStatus>(() =>
-    typeof window !== "undefined" && !navigator.onLine ? "offline" : "synced",
+    typeof window !== "undefined" && !navigator.onLine
+      ? "offline"
+      : "synced"
   );
+
   useEffect(() => {
     const online = () => setStatus("synced");
     const offline = () => setStatus("offline");
+
     window.addEventListener("online", online);
     window.addEventListener("offline", offline);
+
     return () => {
       window.removeEventListener("online", online);
       window.removeEventListener("offline", offline);
     };
   }, []);
+
   return status;
 }
 
@@ -58,8 +65,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { t, locale, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
+
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
   const sync = useOnlineSync();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -81,12 +95,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <Menu />
             </Button>
+
             <Link href="/" className="flex items-center gap-2">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-sm font-bold text-[var(--forest)] shadow-lg shadow-emerald-900/30">
                 S
               </span>
+
               <div className="leading-tight">
-                <p className="text-sm font-semibold tracking-wide">{t("brand_name")}</p>
+                <p className="text-sm font-semibold tracking-wide">
+                  {t("brand_name")}
+                </p>
+
                 <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--foreground)]/50">
                   {t("tagline")}
                 </p>
@@ -98,6 +117,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {nav.map((item) => {
               const active = pathname === item.href;
               const Icon = item.icon;
+
               return (
                 <Link key={item.href} href={item.href}>
                   <span
@@ -105,7 +125,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       "flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
                       active
                         ? "bg-[var(--foreground)]/10 text-[var(--foreground)]"
-                        : "text-[var(--foreground)]/55 hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]",
+                        : "text-[var(--foreground)]/55 hover:bg-[var(--foreground)]/5 hover:text-[var(--foreground)]"
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -118,8 +138,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-2">
             <Badge variant={sync === "offline" ? "outline" : "secondary"}>
-              {sync === "offline" ? t("sync_offline") : t("sync_synced")}
+              {sync === "offline"
+                ? t("sync_offline")
+                : t("sync_synced")}
             </Badge>
+
             <select
               value={locale}
               onChange={(e) => setLocale(e.target.value as Locale)}
@@ -127,21 +150,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-label={t("shell_aria_language")}
             >
               {locales.map((l) => (
-                <option key={l} value={l} className="bg-[var(--background)] text-[var(--foreground)]">
+                <option
+                  key={l}
+                  value={l}
+                  className="bg-[var(--background)] text-[var(--foreground)]"
+                >
                   {localeLabels[l]}
                 </option>
               ))}
             </select>
+
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              onClick={() =>
+                setTheme(theme === "dark" ? "light" : "dark")
+              }
               aria-label={t("shell_aria_theme")}
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {!mounted ? null : theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </Button>
+
             <Link href="/login">
-              <Button variant="secondary" size="sm" className="hidden sm:inline-flex">
+              <Button
+                variant="secondary"
+                size="sm"
+                className="hidden sm:inline-flex"
+              >
                 {t("nav_login")}
               </Button>
             </Link>
@@ -153,6 +192,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <nav className="flex flex-col gap-1">
               {nav.map((item) => {
                 const Icon = item.icon;
+
                 return (
                   <Link
                     key={item.href}
@@ -165,7 +205,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </Link>
                 );
               })}
-              <Link href="/login" onClick={() => setOpen(false)} className="px-3 py-2 text-sm">
+
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="px-3 py-2 text-sm"
+              >
                 {t("nav_login")}
               </Link>
             </nav>
@@ -173,7 +218,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 md:px-6">{children}</main>
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-8 md:px-6">
+        {children}
+      </main>
     </div>
   );
 }

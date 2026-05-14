@@ -17,6 +17,7 @@ import { clusterStats, cropDistribution, harvestRows, wastePool } from "@/lib/de
 import { Sparkles, TrendingUp } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
 import { WasteToWealthPanel } from "@/components/waste-to-wealth/waste-to-wealth-panel";
+import { ApiSmokeTest } from "@/components/dev/api-smoke-test";
 
 const demandSupply = [
   { week: "W1", demand: 42, supply: 38 },
@@ -84,8 +85,8 @@ export default function DashboardPage() {
             </CardTitle>
             <CardDescription>{t("dash_chart_desc")}</CardDescription>
           </CardHeader>
-          <CardContent className="h-72 min-h-[18rem] w-full min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
+          <CardContent className="w-full min-w-0">
+            <ResponsiveContainer width="100%" height={288}>
               <AreaChart data={demandSupply}>
                 <defs>
                   <linearGradient id="d" x1="0" y1="0" x2="0" y2="1">
@@ -228,6 +229,16 @@ export default function DashboardPage() {
       </div>
 
       <WasteToWealthPanel />
+
+      <Card glass>
+        <CardHeader>
+          <CardTitle>API connectivity</CardTitle>
+          <CardDescription>Smoke-test backend routes against your Supabase and external services.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ApiSmokeTest />
+        </CardContent>
+      </Card>
 
       <Card glass>
         <CardHeader>

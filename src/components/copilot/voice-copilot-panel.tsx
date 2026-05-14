@@ -86,7 +86,29 @@ export function VoiceCopilotPanel() {
   const askAI = useCallback(async () => {
     const q = transcript.trim() || t("voice_default_question");
     setLoading(true);
+    const langCode = (lang.split("-")[0] || "kn").toLowerCase();
     try {
+      const copilotRes = await fetch("/api/copilot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: q,
+          lang: langCode,
+          farmContext: {
+            crop: "mixed",
+            soil: "black cotton",
+            district: "Yadgir",
+            weather: "check forecast",
+          },
+        }),
+      });
+      if (copilotRes.ok) {
+        const data = (await copilotRes.json()) as { reply: string };
+        setReply(data.reply);
+        await cacheAdvisory(`last:${lang}`, data.reply, lang);
+        speak(data.reply);
+        return;
+      }
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
