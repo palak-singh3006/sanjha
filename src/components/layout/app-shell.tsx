@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Store,
   Sparkles,
+  Sprout,
   MessagesSquare,
   Leaf,
   Map,
@@ -28,6 +29,7 @@ import type { SyncStatus } from "@/lib/offline/db";
 
 const nav = [
   { href: "/dashboard", key: "nav_dashboard", icon: LayoutDashboard },
+  { href: "/crop-intelligence", key: "nav_crop_intel", icon: Sprout },
   { href: "/marketplace", key: "nav_market", icon: Store },
   { href: "/copilot", key: "nav_copilot", icon: Sparkles },
   { href: "/community", key: "nav_community", icon: MessagesSquare },
@@ -72,6 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const sync = useOnlineSync();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

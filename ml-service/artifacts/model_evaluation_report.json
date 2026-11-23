@@ -1,0 +1,62 @@
+{
+  "dataset": {
+    "file": "crop_yield_india.csv",
+    "type": "synthetic",
+    "provenance": "Synthetic benchmark dataset generated via generate_dataset.py for hackathon prototype testing",
+    "disclaimer": "Experimental model trained on synthetic data. Not validated for real-world yield prediction.",
+    "samples": 1500,
+    "crops_supported": [
+      "chilli",
+      "cotton",
+      "maize",
+      "onion",
+      "potato",
+      "pulses",
+      "rice",
+      "sugarcane",
+      "tomato",
+      "wheat"
+    ],
+    "features": [
+      "crop",
+      "season",
+      "soil_type",
+      "rainfall_mm",
+      "temperature_c",
+      "nitrogen_n",
+      "phosphorus_p",
+      "potassium_k"
+    ],
+    "target": "yield_kg_per_acre",
+    "target_unit": "kg/acre"
+  },
+  "evaluation_synthetic_test_set": {
+    "Baseline (Mean Predictor)": {
+      "mae": 5497.7,
+      "rmse": 7859.84,
+      "r2_score": -0.015
+    },
+    "Random Forest Regressor": {
+      "mae": 495.26,
+      "rmse": 875.02,
+      "r2_score": 0.9874
+    },
+    "Gradient Boosting Regressor": {
+      "mae": 481.32,
+      "rmse": 862.57,
+      "r2_score": 0.9878
+    }
+  },
+  "best_model": {
+    "name": "Gradient Boosting Regressor",
+    "synthetic_test_r2": 0.9878,
+    "synthetic_test_mae_kg_per_acre": 481.32,
+    "synthetic_test_rmse_kg_per_acre": 862.57
+  },
+  "limitations": [
+    "Experimental model trained on synthetic data. Not validated for real-world yield prediction.",
+    "Data was programmatically generated using mathematical response curves, not raw ICAR field observations.",
+    "Evaluation scores reflect fit on synthetic test data and do NOT represent real-world agronomic accuracy.",
+    "Never use these predictions for real-world farm finance, seed purchase, or agronomic planning."
+  ]
+}

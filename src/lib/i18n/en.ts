@@ -3,6 +3,7 @@ import type { Dict } from "./types";
 /** Full English source — every UI string key must exist here. */
 export const en: Dict = {
   nav_dashboard: "Dashboard",
+  nav_crop_intel: "Crop Intel",
   nav_market: "Marketplace",
   nav_copilot: "AI Copilot",
   nav_community: "Community",
