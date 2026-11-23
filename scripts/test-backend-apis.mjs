@@ -43,9 +43,9 @@ async function waitForServer(url, timeoutMs = 20000) {
 
 async function main() {
   console.log(`\nStarting Next.js server on port ${PORT}...`);
-  const server = spawn("node", ["./node_modules/.bin/next", "start", "-p", String(PORT)], {
+  const server = spawn(process.execPath, ["./node_modules/.bin/next", "start", "-p", String(PORT)], {
     stdio: "inherit",
-    env: { ...process.env, PORT: String(PORT) },
+    env: { ...process.env, PORT: String(PORT), PATH: `${process.env.HOME}/.local/bin:${process.env.PATH}` },
   });
 
   server.on("error", (err) => {
