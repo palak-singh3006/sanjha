@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { getSupabaseAdminOptional } from "@/lib/supabase-admin";
 import {
   formatRouteError,
   hintForFetchFailedToSupabase,
@@ -6,16 +6,53 @@ import {
   serializeFetchFailure,
   stringifySupabaseError,
 } from "@/lib/api-errors";
+import { createListingSchema } from "@/lib/validations/listing";
+import { handleValidationError } from "@/lib/api-response";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
     const crop = req.nextUrl.searchParams.get("crop");
-    const admin = getSupabaseAdmin();
+    const admin = getSupabaseAdminOptional();
+
+    if (!admin) {
+      // Demo fallback listings matching frontend structure
+      const demoListings = [
+        {
+          id: "e1000000-0000-0000-0000-000000000001",
+          crop_name: "Tomato",
+          quantity_kg: 2500,
+          quality_grade: "A",
+          min_price: 34.0,
+          available_date: new Date(Date.now() + 12 * 86400000).toISOString().split("T")[0],
+          location_text: "Hunasagi Mandi Yard",
+          status: "open",
+          farmer_name: "Sharanappa Gowda",
+          bids_count: 1,
+        },
+        {
+          id: "e1000000-0000-0000-0000-000000000002",
+          crop_name: "Onion",
+          quantity_kg: 4000,
+          quality_grade: "A",
+          min_price: 28.5,
+          available_date: new Date(Date.now() + 25 * 86400000).toISOString().split("T")[0],
+          location_text: "Hunasagi Mandi Yard",
+          status: "open",
+          farmer_name: "Sharanappa Gowda",
+          bids_count: 0,
+        },
+      ];
+      if (crop) {
+        return Response.json(
+          demoListings.filter((l) => l.crop_name.toLowerCase().includes(crop.toLowerCase())),
+        );
+      }
+      return Response.json(demoListings);
+    }
 
     let query = admin.from("listings").select("*").eq("status", "open");
-
-    if (crop) query = query.eq("crop_name", crop);
+    if (crop) query = query.ilike("crop_name", `%${crop}%`);
 
     let data;
     let error;
@@ -60,7 +97,29 @@ export async function GET(req: NextRequest) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const admin = getSupabaseAdmin();
+    const parsed = createListingSchema.safeParse(body);
+    if (!parsed.success) {
+      return handleValidationError(parsed.error);
+    }
+    const val = parsed.data;
+
+    const admin = getSupabaseAdminOptional();
+    if (!admin) {
+      return Response.json({
+        id: crypto.randomUUID(),
+        farm_id: val.farmId,
+        crop_name: val.cropName,
+        quantity_kg: val.quantityKg,
+        quality_grade: val.qualityGrade,
+        min_price: val.minPrice,
+        available_date: val.availableDate,
+        location_text: val.locationText,
+        lat: val.lat,
+        lng: val.lng,
+        status: val.status,
+        isDemo: true,
+      });
+    }
 
     let data;
     let error;
@@ -68,15 +127,17 @@ export async function POST(req: Request) {
       const result = await admin
         .from("listings")
         .insert({
-          farm_id: body.farmId,
-          crop_name: body.cropName,
-          quantity_kg: body.quantityKg,
-          quality_grade: body.qualityGrade,
-          min_price: body.minPrice,
-          available_date: body.availableDate,
-          location_text: body.locationText,
-          lat: body.lat,
-          lng: body.lng,
+          farm_id: val.farmId,
+          farmer_id: val.farmerId || "a1000000-0000-0000-0000-000000000001",
+          crop_name: val.cropName,
+          quantity_kg: val.quantityKg,
+          quality_grade: val.qualityGrade,
+          min_price: val.minPrice,
+          available_date: val.availableDate,
+          location_text: val.locationText,
+          lat: val.lat,
+          lng: val.lng,
+          status: val.status,
         })
         .select()
         .single();
