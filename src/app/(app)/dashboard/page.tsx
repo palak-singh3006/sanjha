@@ -16,10 +16,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { clusterStats as defaultClusterStats, cropDistribution as defaultCropDist, harvestRows as defaultHarvestRows, wastePool as defaultWastePool } from "@/lib/demo-data";
-import { Sparkles, TrendingUp, RefreshCw, Sprout, CheckCircle2 } from "lucide-react";
+import { TrendingUp, RefreshCw, Sprout, CheckCircle2, Users, Layers, AlertCircle, ArrowUpRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
 import { WasteToWealthPanel } from "@/components/waste-to-wealth/waste-to-wealth-panel";
-import { ApiSmokeTest } from "@/components/dev/api-smoke-test";
 import { apiDashboardSummary, apiDri } from "@/lib/http/api";
 
 const defaultDemandSupply = [
@@ -139,45 +138,54 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header with Cluster Selector & Live Refresh */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div className="space-y-6">
+      {/* Header Section: Editorial agritech title & Cluster switcher */}
+      <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <motion.h1
-            className="text-3xl font-semibold tracking-tight md:text-4xl"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            {t("dash_title")}
-          </motion.h1>
-          <p className="mt-2 max-w-2xl text-[var(--foreground)]/65">
-            {clusterData.village} · {clusterData.district}. {t("dash_sub")}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-[var(--muted-foreground)]">
+              SANJHA Operations Command
+            </span>
+            <span className="text-[var(--border-strong)]">·</span>
+            <Badge variant="leaf" className="text-[10px] py-0 px-2">Live Telemetry</Badge>
+          </div>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl text-[var(--foreground)]">
+            {clusterData.village}
+          </h1>
+          <p className="mt-1 text-xs text-[var(--muted-foreground)] max-w-xl">
+            {clusterData.district} · Unified harvesting schedule, market pressure index, and collective biomass aggregation.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Interactive Cluster Switcher */}
-          <div className="flex rounded-xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-1 backdrop-blur-md">
+        {/* Cluster Selector & Live Refresh */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center rounded-md border border-[var(--border)] bg-[var(--card)] p-0.5">
             <button
               onClick={() => setClusterId("HUN-01")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
-                clusterId === "HUN-01" ? "bg-emerald-500 text-white shadow-sm" : "text-[var(--foreground)]/70 hover:text-[var(--foreground)]"
+              className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+                clusterId === "HUN-01"
+                  ? "bg-[var(--forest)] text-[var(--primary-foreground)] shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               }`}
             >
               Hunasagi (HUN-01)
             </button>
             <button
               onClick={() => setClusterId("KEM-01")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
-                clusterId === "KEM-01" ? "bg-emerald-500 text-white shadow-sm" : "text-[var(--foreground)]/70 hover:text-[var(--foreground)]"
+              className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+                clusterId === "KEM-01"
+                  ? "bg-[var(--forest)] text-[var(--primary-foreground)] shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               }`}
             >
               Kembhavi (KEM-01)
             </button>
             <button
               onClick={() => setClusterId("SHO-01")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
-                clusterId === "SHO-01" ? "bg-emerald-500 text-white shadow-sm" : "text-[var(--foreground)]/70 hover:text-[var(--foreground)]"
+              className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+                clusterId === "SHO-01"
+                  ? "bg-[var(--forest)] text-[var(--primary-foreground)] shadow-xs"
+                  : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
               }`}
             >
               Shorapur (SHO-01)
@@ -189,279 +197,346 @@ export default function DashboardPage() {
             size="sm"
             onClick={() => loadDashboardData(clusterId)}
             disabled={loading}
-            className="gap-1.5 py-1.5"
+            className="h-8 gap-1.5 text-xs border-[var(--border)]"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
-            Live Sync
+            <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin text-[var(--forest)]" : "text-[var(--muted-foreground)]"}`} />
+            <span>Sync</span>
           </Button>
-
-          <Badge variant="gold" className="w-fit gap-1 py-1.5">
-            <Sparkles className="h-3.5 w-3.5" />
-            {t("dash_badge_cluster")}
-          </Badge>
         </div>
       </div>
 
-      {/* Top 3 Live Cluster Metric Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        {[
-          { label: t("dash_stat_farmers"), value: clusterData.farmers },
-          { label: t("dash_stat_crops"), value: clusterData.activeCrops },
-          {
-            label: t("dash_stat_tomato"),
-            value: `${clusterData.tomatoSaturation}%`,
-          },
-        ].map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
-          >
-            <Card glass>
-              <CardHeader className="pb-2">
-                <CardDescription>{s.label}</CardDescription>
-                <CardTitle className="text-3xl tabular-nums">{s.value}</CardTitle>
-              </CardHeader>
-            </Card>
-          </motion.div>
-        ))}
+      {/* Primary Key Metrics Grid (Controlled hierarchy, not 3 identical AI cards) */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Metric 1: Farmers */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+              {t("dash_stat_farmers")}
+            </span>
+            <Users className="h-4 w-4 text-[var(--muted-foreground)]" />
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">
+              {clusterData.farmers}
+            </span>
+            <span className="text-xs text-[var(--muted-foreground)]">cultivators</span>
+          </div>
+          <p className="mt-2 text-xs text-[var(--muted-foreground)]">
+            Registered in co-op registry
+          </p>
+        </div>
+
+        {/* Metric 2: Active Crops */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+              {t("dash_stat_crops")}
+            </span>
+            <Layers className="h-4 w-4 text-[var(--muted-foreground)]" />
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">
+              {clusterData.activeCrops}
+            </span>
+            <span className="text-xs text-[var(--muted-foreground)]">varieties</span>
+          </div>
+          <p className="mt-2 text-xs text-[var(--muted-foreground)]">
+            Across Kharif & Rabi cycles
+          </p>
+        </div>
+
+        {/* Metric 3: Tomato Saturation & Glut Risk */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+              {t("dash_stat_tomato")}
+            </span>
+            <span className={`h-2 w-2 rounded-full ${clusterData.tomatoSaturation > 50 ? "bg-amber-600" : "bg-[var(--leaf)]"}`} />
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">
+              {clusterData.tomatoSaturation}%
+            </span>
+            <Badge variant={clusterData.tomatoSaturation > 50 ? "gold" : "forest"} className="text-[10px] py-0 px-1.5">
+              {clusterData.tomatoSaturation > 50 ? "High Concentration" : "Balanced"}
+            </Badge>
+          </div>
+          <p className="mt-2 text-xs text-[var(--muted-foreground)]">
+            Acreage under single-crop peak
+          </p>
+        </div>
+
+        {/* Metric 4: Biomass Aggregated */}
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-[var(--muted-foreground)] uppercase tracking-wider">
+              Biomass Aggregated
+            </span>
+            <Sprout className="h-4 w-4 text-[var(--muted-foreground)]" />
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-semibold tabular-nums text-[var(--foreground)]">
+              {wasteData.qtyTons}t
+            </span>
+            <span className="text-xs font-mono font-medium text-[var(--forest)]">
+              ₹{(wasteData.valueINR / 1000).toFixed(0)}k val
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-[var(--muted-foreground)]">
+            {wasteData.buyersUnlocked} active bio-refinery buyers
+          </p>
+        </div>
       </div>
 
-      {/* Dynamic Charts & AI Recommendation */}
-      <div className="grid gap-4 lg:grid-cols-5">
-        <Card glass className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-emerald-400" />
-              {t("dash_chart_title")}
-            </CardTitle>
-            <CardDescription>{t("dash_chart_desc")}</CardDescription>
-          </CardHeader>
-          <CardContent className="w-full min-w-0">
-            <ResponsiveContainer width="100%" height={288}>
-              <AreaChart data={demandSupply}>
+      {/* Main Analysis Section: Demand vs Supply (Recharts) + Agronomic Advisory */}
+      <div className="grid gap-6 lg:grid-cols-12">
+        {/* Demand vs Supply Chart */}
+        <div className="lg:col-span-8 rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-[var(--border)]">
+            <div>
+              <h2 className="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-[var(--forest)]" />
+                {t("dash_chart_title")}
+              </h2>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("dash_chart_desc")}
+              </p>
+            </div>
+            {/* Chart Legend */}
+            <div className="flex items-center gap-4 text-xs">
+              <span className="flex items-center gap-1.5 font-medium text-[var(--foreground)]">
+                <span className="h-2 w-2 rounded-full bg-[#244B38]" />
+                Demand (APMC)
+              </span>
+              <span className="flex items-center gap-1.5 font-medium text-[var(--foreground)]">
+                <span className="h-2 w-2 rounded-full bg-[#B8864B]" />
+                Supply (Harvests)
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-4 h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={demandSupply} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
-                  <linearGradient id="d" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#34d399" stopOpacity={0} />
+                  <linearGradient id="colorDemand" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#244B38" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#244B38" stopOpacity={0} />
                   </linearGradient>
-                  <linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#fbbf24" stopOpacity={0} />
+                  <linearGradient id="colorSupply" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#B8864B" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#B8864B" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.15)" />
-                <XAxis dataKey="week" stroke="rgba(148,163,184,0.5)" />
-                <YAxis stroke="rgba(148,163,184,0.5)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#DFDED4" vertical={false} />
+                <XAxis
+                  dataKey="week"
+                  stroke="#77796F"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={{ stroke: "#DFDED4" }}
+                />
+                <YAxis
+                  stroke="#77796F"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={{ stroke: "#DFDED4" }}
+                  unit="t"
+                />
                 <Tooltip
                   contentStyle={{
-                    background: "rgba(12,24,20,0.92)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 12,
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #DFDED4",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                    fontSize: "12px",
                   }}
+                  itemStyle={{ padding: "2px 0" }}
                 />
                 <Area
                   type="monotone"
                   dataKey="demand"
-                  stroke="#34d399"
-                  fillOpacity={1}
-                  fill="url(#d)"
+                  name="Procurement Demand (Tons)"
+                  stroke="#244B38"
                   strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorDemand)"
                 />
                 <Area
                   type="monotone"
                   dataKey="supply"
-                  stroke="#fbbf24"
-                  fillOpacity={1}
-                  fill="url(#s)"
+                  name="Scheduled Supply (Tons)"
+                  stroke="#B8864B"
                   strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorSupply)"
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card glass className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>{t("dash_ai_title")}</CardTitle>
-            <CardDescription>{t("dash_ai_desc")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 to-transparent p-4 text-sm leading-relaxed">
-              {clusterData.aiLine}
+        {/* Agronomic Advisory & Rebalancing */}
+        <div className="lg:col-span-4 rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
+              <h2 className="text-sm font-semibold text-[var(--foreground)] uppercase tracking-wider">
+                Agronomic Advisory
+              </h2>
+              <Badge variant="secondary" className="text-[10px]">Decision Support</Badge>
             </div>
-            <div>
-              <p className="mb-2 text-xs uppercase tracking-wider text-[var(--foreground)]/50">
-                {t("dash_ai_suggested")}
-              </p>
-              <p className="font-medium text-emerald-600 dark:text-emerald-300">{clusterData.suggestedCrop}</p>
+
+            <div className="mt-4 rounded-lg bg-[var(--muted)]/60 border border-[var(--border)] p-3.5 text-xs text-[var(--foreground)] leading-relaxed">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-[var(--forest)] shrink-0 mt-0.5" />
+                <span>{clusterData.aiLine}</span>
+              </div>
             </div>
-            <div>
-              <p className="mb-2 text-xs uppercase tracking-wider text-[var(--foreground)]/50">
-                {t("dash_ai_saturation")} ({clusterData.tomatoSaturation}%)
-              </p>
-              <Progress value={clusterData.tomatoSaturation} />
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--muted-foreground)]">
+                  Diversification Opportunity
+                </span>
+                <p className="mt-1 text-sm font-semibold text-[var(--forest)]">
+                  {clusterData.suggestedCrop}
+                </p>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs text-[var(--muted-foreground)] mb-1.5">
+                  <span>Acreage Saturation Meter</span>
+                  <span className="font-semibold text-[var(--foreground)]">{clusterData.tomatoSaturation}%</span>
+                </div>
+                <Progress value={clusterData.tomatoSaturation} className="h-2" />
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          <div className="pt-4 border-t border-[var(--border)] mt-4">
+            <p className="text-[11px] text-[var(--muted-foreground)]">
+              Cooperative staggered harvesting reduces market pressure by up to 24% across local APMCs.
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Harvest Intelligence with Interactive DRI Delay Simulator */}
-      <Card glass>
-        <CardHeader className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+      {/* Upcoming Harvest Pipeline with Interactive DRI Stagger Action */}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-[var(--border)] gap-2">
           <div>
-            <CardTitle>{t("dash_harvest_title")}</CardTitle>
-            <CardDescription>{t("dash_harvest_desc")}</CardDescription>
+            <h2 className="text-base font-semibold text-[var(--foreground)]">
+              {t("dash_harvest_title")}
+            </h2>
+            <p className="text-xs text-[var(--muted-foreground)]">
+              {t("dash_harvest_desc")}
+            </p>
           </div>
-          <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-300">
-            Interactive DRI Simulation
+          <Badge variant="outline" className="text-xs font-mono">
+            DRI Pipeline: {harvests.length} Plots Scheduled
           </Badge>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
+        </div>
+
+        {/* Harvest Grid */}
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
           {harvests.map((h, i) => {
             const plotStagger = staggerState[h.farm];
             const currentRisk = plotStagger?.newRisk ?? h.risk;
             const currentDate = plotStagger?.newDate ?? h.date;
 
             return (
-              <motion.div
+              <div
                 key={h.farm}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.05 }}
-                className="flex flex-col justify-between rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4"
+                className="flex flex-col justify-between rounded-lg border border-[var(--border)] bg-[var(--background)]/60 p-4"
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold">{h.farm}</p>
-                    {plotStagger?.delayed && (
-                      <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-500">
-                        <CheckCircle2 className="h-3 w-3" /> Staggered
+                    <p className="text-sm font-semibold text-[var(--foreground)]">{h.farm}</p>
+                    {plotStagger?.delayed ? (
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Staggered
                       </span>
+                    ) : (
+                      <Badge variant={currentRisk > 60 ? "danger" : "forest"} className="text-[10px]">
+                        Risk {currentRisk}%
+                      </Badge>
                     )}
                   </div>
-                  <p className="mt-1.5 text-xs text-[var(--foreground)]/60">{h.weather}</p>
+
+                  <p className="mt-1 text-xs text-[var(--muted-foreground)]">{h.weather}</p>
+
                   <div className="mt-3 space-y-2">
-                    <div className="flex justify-between text-xs uppercase tracking-wider text-[var(--foreground)]/50">
-                      <span>{t("dash_risk")}</span>
-                      <span className={currentRisk > 60 ? "font-bold text-red-400" : "font-bold text-emerald-400"}>
-                        {currentRisk}%
-                      </span>
+                    <div className="flex justify-between text-xs text-[var(--muted-foreground)]">
+                      <span>Market Glut Pressure</span>
+                      <span className="font-mono font-medium text-[var(--foreground)]">{h.marketPressure}%</span>
                     </div>
-                    <Progress value={currentRisk} />
-                    <div className="flex justify-between text-xs uppercase tracking-wider text-[var(--foreground)]/50">
-                      <span>{t("dash_pressure")}</span>
-                      <span>{h.marketPressure}%</span>
-                    </div>
-                    <Progress value={h.marketPressure} />
+                    <Progress value={h.marketPressure} className="h-1.5" />
                   </div>
-                  <p className="mt-3 text-sm font-semibold text-emerald-600 dark:text-emerald-300">
-                    {currentDate}
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--foreground)]/55">
-                    {t("dash_harvest_ai_prefix")} {(h.confidence * 100).toFixed(0)}% —{" "}
-                    {t("dash_harvest_ai_suffix")}
-                  </p>
+
+                  <div className="mt-3.5 rounded bg-[var(--card)] border border-[var(--border)] px-2.5 py-1.5">
+                    <p className="text-xs font-semibold text-[var(--forest)]">
+                      {currentDate}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="mt-4 pt-2">
+                <div className="mt-4 pt-3 border-t border-[var(--border)]">
                   <Button
                     size="sm"
                     variant={plotStagger?.delayed ? "secondary" : "outline"}
-                    className="w-full gap-1.5 text-xs"
+                    className="w-full h-8 text-xs font-medium"
                     disabled={simulatingPlot === h.farm || plotStagger?.delayed}
                     onClick={() => handleStaggerHarvest(h)}
                   >
-                    <Sprout className={`h-3.5 w-3.5 ${simulatingPlot === h.farm ? "animate-spin text-emerald-400" : ""}`} />
+                    <Sprout className={`h-3.5 w-3.5 ${simulatingPlot === h.farm ? "animate-spin text-[var(--forest)]" : ""}`} />
                     {simulatingPlot === h.farm
-                      ? "Simulating AI Stagger..."
+                      ? "Simulating Stagger..."
                       : plotStagger?.delayed
-                      ? "Delay Synchronized (-20% Risk)"
-                      : "Simulate Staggered Harvest"}
+                      ? "Synchronized (-22% Risk)"
+                      : "Stagger Harvest (+3d)"}
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
-        </CardContent>
-      </Card>
-
-      {/* Waste to Wealth Circular Logistics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card glass className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>{t("dash_waste_title")}</CardTitle>
-            <CardDescription>{t("dash_waste_desc")}</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-4xl font-semibold tabular-nums">{wasteData.qtyTons}t</p>
-              <p className="text-sm text-[var(--foreground)]/60">
-                {tReplace("dash_waste_recover", {
-                  value: (wasteData.valueINR / 1000).toFixed(0),
-                  buyers: wasteData.buyersUnlocked,
-                })}
-              </p>
-            </div>
-            <div className="max-w-md rounded-2xl border border-amber-400/25 bg-amber-400/10 p-4 text-sm">
-              {wasteData.message}
-            </div>
-          </CardContent>
-        </Card>
-        <Card glass>
-          <CardHeader>
-            <CardTitle>{t("dash_threshold_title")}</CardTitle>
-            <CardDescription>
-              {tReplace("dash_threshold_desc", { tons: wasteData.threshold })}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Progress value={Math.min(100, (wasteData.qtyTons / (wasteData.threshold * 1.5)) * 100)} />
-          </CardContent>
-        </Card>
+        </div>
       </div>
 
+      {/* Waste-to-Wealth Panel */}
       <WasteToWealthPanel />
 
-      <Card glass>
-        <CardHeader>
-          <CardTitle>API connectivity</CardTitle>
-          <CardDescription>Smoke-test backend routes against your Supabase and external services.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ApiSmokeTest />
-        </CardContent>
-      </Card>
+      {/* Crop Acreage Distribution */}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+        <div className="pb-4 border-b border-[var(--border)]">
+          <h2 className="text-base font-semibold text-[var(--foreground)]">
+            {t("dash_crop_dist_title")}
+          </h2>
+          <p className="text-xs text-[var(--muted-foreground)]">
+            {t("dash_crop_dist_desc")}
+          </p>
+        </div>
 
-      {/* Dynamic Crop Distribution */}
-      <Card glass>
-        <CardHeader>
-          <CardTitle>{t("dash_crop_dist_title")}</CardTitle>
-          <CardDescription>{t("dash_crop_dist_desc")}</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-5">
-          {cropDist.map((c, i) => (
-            <motion.div
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {cropDist.map((c) => (
+            <div
               key={c.name}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.05 }}
-              className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4"
+              className="rounded-lg border border-[var(--border)] bg-[var(--background)]/60 p-3.5"
             >
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">{c.name}</span>
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-[var(--foreground)]">{c.name}</span>
                 <span
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: c.fill || "#10b981" }}
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: c.fill || "#244B38" }}
                 />
               </div>
-              <p className="mt-3 text-3xl font-semibold tabular-nums">{c.value}%</p>
-              <Progress value={c.value} className="mt-3" />
-            </motion.div>
+              <p className="mt-2 text-2xl font-semibold tabular-nums text-[var(--foreground)]">
+                {c.value}%
+              </p>
+              <Progress value={c.value} className="mt-2.5 h-1.5" />
+            </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

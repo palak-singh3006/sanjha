@@ -32,7 +32,7 @@ async function waitForServer(url, timeoutMs = 20000) {
   while (Date.now() - start < timeoutMs) {
     try {
       const res = await fetch(`${url}/api/auth/me`);
-      if (res.status === 200) return true;
+      if (res.status > 0) return true;
     } catch {
       // wait a bit
     }
@@ -43,7 +43,7 @@ async function waitForServer(url, timeoutMs = 20000) {
 
 async function main() {
   console.log(`\nStarting Next.js server on port ${PORT}...`);
-  const server = spawn(process.execPath, ["./node_modules/.bin/next", "start", "-p", String(PORT)], {
+  const server = spawn(process.execPath, ["./node_modules/.bin/next", "start", "-p", String(PORT), "-H", "127.0.0.1"], {
     stdio: "inherit",
     env: { ...process.env, PORT: String(PORT), PATH: `${process.env.HOME}/.local/bin:${process.env.PATH}` },
   });

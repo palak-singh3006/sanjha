@@ -371,30 +371,42 @@ export function CommunityDashboard({
                     </ResponsiveContainer>
                   </div>
 
-                  {/* Crop Breakdown Table */}
-                  <div className="mt-4 border-t border-[var(--foreground)]/10 pt-4">
-                    <div className="space-y-2">
-                      {insight.crop_stats.map((c, idx) => (
-                        <div key={c.crop_name} className="flex items-center justify-between text-xs py-1">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="h-2.5 w-2.5 rounded-full"
-                              style={{ backgroundColor: CROP_COLORS[idx % CROP_COLORS.length] }}
-                            />
-                            <span className="font-medium capitalize">{c.crop_name}</span>
-                            <span className="text-[var(--foreground)]/50">
-                              ({c.farmer_count} {c.farmer_count === 1 ? "farmer" : "farmers"})
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="tabular-nums font-semibold">{c.total_acreage} ac</span>
-                            <span className="text-[var(--foreground)]/50 w-12 text-right tabular-nums">
-                              {c.percentage}%
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  {/* Clean Crop Breakdown Table */}
+                  <div className="mt-4 border-t border-[var(--border)] pt-4 overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead>
+                        <tr className="border-b border-[var(--border)] text-[11px] uppercase tracking-wider text-[var(--muted-foreground)]">
+                          <th className="pb-2 font-medium">Crop</th>
+                          <th className="pb-2 font-medium">Farms</th>
+                          <th className="pb-2 font-medium text-right">Acreage</th>
+                          <th className="pb-2 font-medium text-right">Community Share</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--border)]">
+                        {insight.crop_stats.map((c, idx) => (
+                          <tr key={c.crop_name} className="hover:bg-[var(--muted)]/30 transition-colors">
+                            <td className="py-2 flex items-center gap-2">
+                              <span
+                                className="h-2 w-2 rounded-full shrink-0"
+                                style={{ backgroundColor: CROP_COLORS[idx % CROP_COLORS.length] }}
+                              />
+                              <span className="font-medium text-[var(--foreground)] capitalize">{c.crop_name}</span>
+                            </td>
+                            <td className="py-2 text-[var(--muted-foreground)] tabular-nums">
+                              {c.farmer_count} {c.farmer_count === 1 ? "farm" : "farms"}
+                            </td>
+                            <td className="py-2 text-right font-mono font-medium text-[var(--foreground)] tabular-nums">
+                              {c.total_acreage} ac
+                            </td>
+                            <td className="py-2 text-right">
+                              <span className="font-mono font-semibold text-[var(--forest)] tabular-nums">
+                                {c.percentage}%
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </CardContent>
               </Card>

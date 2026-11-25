@@ -424,12 +424,11 @@ export function ClusterMap() {
 
   return (
     <div className="space-y-4">
-      {/* Interactive Controls & Filters */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 backdrop-blur-md">
-        {/* Cluster Region Switcher */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--foreground)]/10 pb-2">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]/80">
-            <MapPin className="h-4 w-4 text-emerald-500" />
+      {/* Top Filter Bar: Multi-Cluster Navigation & Regional Controls */}
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] pb-3">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]">
+            <MapPin className="h-4 w-4 text-[var(--forest)]" />
             <span>Regional Cluster:</span>
           </div>
 
@@ -444,7 +443,9 @@ export function ClusterMap() {
                 key={c.id}
                 variant={selectedCluster === c.id ? "default" : "outline"}
                 size="sm"
-                className={`h-7 text-xs ${selectedCluster === c.id ? "bg-emerald-600 text-white dark:bg-emerald-500" : ""}`}
+                className={`h-7 px-3 text-xs rounded border-[var(--border)] ${
+                  selectedCluster === c.id ? "bg-[var(--forest)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)]" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+                }`}
                 onClick={() => {
                   setSelectedCluster(c.id);
                   const firstInCluster = farms.find((f) => c.id === "all" || f.clusterCode === c.id);
@@ -457,14 +458,14 @@ export function ClusterMap() {
             ))}
 
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              className="h-7 gap-1 text-xs"
+              className="h-7 gap-1 text-xs border-[var(--border)]"
               onClick={loadLiveData}
               disabled={loading}
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
-              Live Sync
+              <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin text-[var(--forest)]" : "text-[var(--muted-foreground)]"}`} />
+              Sync
             </Button>
           </div>
         </div>
@@ -472,8 +473,8 @@ export function ClusterMap() {
         {/* Commodity & Risk Filtering + Area Overlays Toggle */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 text-xs font-medium text-[var(--foreground)]/70">
-              <Filter className="h-3.5 w-3.5 text-emerald-500" />
+            <div className="flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
+              <Filter className="h-3 w-3 text-[var(--forest)]" />
               <span>Crop:</span>
             </div>
             {["all", "Tomato", "Onion", "Cotton", "Pulses", "Paddy"].map((crop) => (
@@ -481,7 +482,7 @@ export function ClusterMap() {
                 key={crop}
                 variant={cropFilter === crop ? "default" : "outline"}
                 size="sm"
-                className="h-7 text-xs capitalize"
+                className="h-7 px-2.5 text-xs capitalize rounded border-[var(--border)]"
                 onClick={() => setCropFilter(crop)}
               >
                 {crop === "all" ? "All Crops" : crop}
@@ -490,20 +491,20 @@ export function ClusterMap() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-1 text-xs font-medium text-[var(--foreground)]/70">
+            <div className="flex items-center gap-1 text-xs font-medium text-[var(--muted-foreground)]">
               <span>Risk:</span>
             </div>
             {[
-              { key: "all", label: "All Risk" },
-              { key: "high", label: "High Risk Area", color: "text-red-400" },
-              { key: "med", label: "Medium", color: "text-amber-400" },
-              { key: "low", label: "Low Risk Safe", color: "text-emerald-400" },
+              { key: "all", label: "All" },
+              { key: "high", label: "High Risk Area", color: "text-red-700" },
+              { key: "med", label: "Moderate", color: "text-amber-700" },
+              { key: "low", label: "Safe Zone", color: "text-[var(--forest)]" },
             ].map((r) => (
               <Button
                 key={r.key}
                 variant={riskFilter === r.key ? "default" : "outline"}
                 size="sm"
-                className={`h-7 text-xs ${r.color || ""}`}
+                className={`h-7 px-2.5 text-xs rounded border-[var(--border)] ${r.color || ""}`}
                 onClick={() => setRiskFilter(r.key)}
               >
                 {r.label}
@@ -513,28 +514,28 @@ export function ClusterMap() {
             <Button
               variant={showRiskZones ? "default" : "outline"}
               size="sm"
-              className={`h-7 gap-1.5 text-xs ${showRiskZones ? "bg-amber-600 text-white hover:bg-amber-700" : ""}`}
+              className={`h-7 px-2.5 gap-1.5 text-xs rounded border-[var(--border)] ${showRiskZones ? "bg-[#B8864B] text-white hover:bg-[#A3753E]" : ""}`}
               onClick={() => setShowRiskZones(!showRiskZones)}
             >
-              <ShieldAlert className="h-3.5 w-3.5" />
-              Risk Area Zones
+              <ShieldAlert className="h-3 w-3" />
+              Risk Catchments
             </Button>
 
             <Button
               variant={showCatchment ? "secondary" : "outline"}
               size="sm"
-              className="h-7 gap-1.5 text-xs"
+              className="h-7 px-2.5 gap-1.5 text-xs rounded border-[var(--border)]"
               onClick={() => setShowCatchment(!showCatchment)}
             >
-              <Layers className="h-3.5 w-3.5 text-emerald-400" />
-              5km Waste Catchment
+              <Layers className="h-3 w-3 text-[var(--forest)]" />
+              Biomass Catchment
             </Button>
           </div>
         </div>
       </div>
 
       {/* Main Interactive Map */}
-      <div className="relative h-[480px] w-full overflow-hidden rounded-2xl border border-[var(--foreground)]/10 shadow-2xl">
+      <div className="relative h-[500px] w-full overflow-hidden rounded-xl border border-[var(--border)]">
         <MapContainer center={currentView.center} zoom={currentView.zoom} className="h-full w-full" scrollWheelZoom>
           <MapController center={currentView.center} zoom={currentView.zoom} />
 
@@ -652,26 +653,23 @@ export function ClusterMap() {
         </MapContainer>
 
         {/* Live Legend & Status Overlay */}
-        <div className="pointer-events-none absolute bottom-3 left-3 flex flex-col gap-1.5 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/90 p-2.5 text-xs shadow-lg backdrop-blur-md">
-          <div className="flex items-center gap-2 font-semibold">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
+        <div className="pointer-events-none absolute bottom-3 left-3 flex flex-col gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--card)]/95 p-3 text-xs shadow-xs">
+          <div className="flex items-center gap-2 font-semibold text-[var(--foreground)]">
+            <span className="h-2 w-2 rounded-full bg-[var(--forest)]" />
             <span>{currentView.label}</span>
           </div>
 
-          <div className="flex items-center gap-3 pt-1 text-[11px] text-[var(--foreground)]/80">
+          <div className="flex items-center gap-3 pt-1 text-[11px] text-[var(--muted-foreground)]">
             <div className="flex items-center gap-1">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-              <span>High Risk (DRI &gt;60%)</span>
+              <span className="h-2 w-2 rounded-full bg-red-600" />
+              <span>High Risk (&gt;60%)</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+              <span className="h-2 w-2 rounded-full bg-amber-500" />
               <span>Moderate (35-60%)</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              <span className="h-2 w-2 rounded-full bg-[var(--forest)]" />
               <span>Low Risk (&lt;35%)</span>
             </div>
           </div>
@@ -680,76 +678,68 @@ export function ClusterMap() {
 
       {/* Selected Farm Detail & Live Simulation Panel */}
       {selectedFarm && (
-        <Card glass className="border-emerald-500/20">
-          <CardContent className="p-4">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold">{selectedFarm.name}</h3>
-                  <Badge
-                    variant={selectedFarm.risk === "med" ? "gold" : "secondary"}
-                    className={
-                      selectedFarm.risk === "high"
-                        ? "border-red-500/40 bg-red-500/15 text-red-400"
-                        : selectedFarm.risk === "low"
-                        ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400"
-                        : undefined
-                    }
-                  >
-                    {selectedFarm.risk.toUpperCase()} RISK · DRI {selectedFarm.driScore}%
-                  </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {selectedFarm.clusterCode} · {selectedFarm.village}
-                  </Badge>
-                </div>
-                <p className="mt-1 text-xs text-[var(--foreground)]/70">
-                  Farmer: <span className="font-medium text-[var(--foreground)]">{selectedFarm.ownerName}</span> · {selectedFarm.acres} Acres ({selectedFarm.soilType} soil) · Variety: {selectedFarm.variety}
-                </p>
-                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-                  <span className="flex items-center gap-1 text-[var(--foreground)]/65">
-                    <Calendar className="h-3.5 w-3.5 text-emerald-400" />
-                    Target Harvest: <strong className="text-[var(--foreground)]">{selectedFarm.expectedHarvestDate}</strong>
-                  </span>
-                  {selectedFarm.recommendedHarvestDate && (
-                    <span className="flex items-center gap-1 text-emerald-500">
-                      <CheckCircle2 className="h-3.5 w-3.5" />
-                      Optimized Slot: <strong>{selectedFarm.recommendedHarvestDate}</strong>
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button
-                  onClick={handleSimulateDri}
-                  disabled={driSimulating}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 text-xs py-2"
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-semibold text-[var(--foreground)]">{selectedFarm.name}</h3>
+                <Badge
+                  variant={selectedFarm.risk === "high" ? "danger" : selectedFarm.risk === "med" ? "gold" : "forest"}
+                  className="text-[10px]"
                 >
-                  <Sprout className={`h-4 w-4 ${driSimulating ? "animate-spin" : ""}`} />
-                  {driSimulating ? "Computing DRI Stagger..." : "Simulate Staggered Harvest"}
-                </Button>
+                  {selectedFarm.risk.toUpperCase()} RISK · DRI {selectedFarm.driScore}%
+                </Badge>
+                <Badge variant="outline" className="text-[10px] font-mono">
+                  {selectedFarm.clusterCode} · {selectedFarm.village}
+                </Badge>
+              </div>
+              <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+                Cultivator: <span className="font-medium text-[var(--foreground)]">{selectedFarm.ownerName}</span> · {selectedFarm.acres} Acres ({selectedFarm.soilType} soil) · Variety: {selectedFarm.variety}
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                <span className="flex items-center gap-1 text-[var(--muted-foreground)]">
+                  <Calendar className="h-3.5 w-3.5 text-[var(--forest)]" />
+                  Target Harvest: <strong className="text-[var(--foreground)] font-mono">{selectedFarm.expectedHarvestDate}</strong>
+                </span>
+                {selectedFarm.recommendedHarvestDate && (
+                  <span className="flex items-center gap-1 text-[var(--forest)] font-medium">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Optimized Slot: <strong className="font-mono">{selectedFarm.recommendedHarvestDate}</strong>
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Simulation Result Banner */}
-            {simulationResult && (
-              <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs">
-                <div className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
-                  <Sparkles className="h-4 w-4" />
-                  <span>Stagger Simulation Output for {selectedFarm.name} ({selectedFarm.clusterCode})</span>
-                </div>
-                <p className="mt-1 text-[var(--foreground)]/80 leading-relaxed">
-                  {simulationResult.verdict}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-4 text-xs font-medium">
-                  <span>Calculated Offset: <strong className="text-emerald-500">+{simulationResult.delayDays} Days</strong></span>
-                  <span>Recommended Slot: <strong className="text-emerald-500">{simulationResult.recommendedDate}</strong></span>
-                  <span>New Mitigated DRI: <strong className="text-emerald-500">{selectedFarm.driScore}% (Nominal)</strong></span>
-                </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={handleSimulateDri}
+                disabled={driSimulating}
+                className="h-8 gap-2 text-xs bg-[var(--forest)] text-[var(--primary-foreground)] hover:bg-[var(--primary-hover)]"
+              >
+                <Sprout className={`h-3.5 w-3.5 ${driSimulating ? "animate-spin" : ""}`} />
+                {driSimulating ? "Computing Stagger..." : "Simulate Staggered Harvest"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Simulation Result Banner */}
+          {simulationResult && (
+            <div className="mt-4 rounded-lg border border-[var(--forest)]/30 bg-[var(--muted)]/50 p-3.5 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-[var(--forest)]">
+                <CheckCircle2 className="h-4 w-4" />
+                <span>Harvest Synchronization for {selectedFarm.name} ({selectedFarm.clusterCode})</span>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              <p className="mt-1 text-xs text-[var(--foreground)] leading-relaxed">
+                {simulationResult.verdict}
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-4 text-xs font-medium">
+                <span>Calculated Offset: <strong className="font-mono text-[var(--forest)]">+{simulationResult.delayDays} Days</strong></span>
+                <span>Recommended Slot: <strong className="font-mono text-[var(--forest)]">{simulationResult.recommendedDate}</strong></span>
+                <span>Mitigated DRI Score: <strong className="font-mono text-[var(--forest)]">{Math.max(16, selectedFarm.driScore - 22)}% (Nominal)</strong></span>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
