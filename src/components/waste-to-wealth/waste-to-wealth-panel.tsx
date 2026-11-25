@@ -197,18 +197,10 @@ export function WasteToWealthPanel() {
     <div className="space-y-4">
       <Card glass>
         <CardHeader>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <CardTitle>{t("w2w_title")}</CardTitle>
-              <CardDescription>
-                {t("w2w_sub")}
-              </CardDescription>
-            </div>
-            <Badge variant="gold">{t("w2w_badge_new")}</Badge>
-          </div>
+          <CardTitle>{t("w2w_title")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 lg:grid-cols-3">
-          <div className="space-y-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4">
+          <div className="space-y-3 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
             <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t("w2w_harvest_log")}</p>
             <label className="block text-sm">
               <span className="text-[var(--foreground)]/60">{t("w2w_farm")}</span>
@@ -250,7 +242,7 @@ export function WasteToWealthPanel() {
             </p>
           </div>
 
-          <div className="space-y-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+          <div className="space-y-3 rounded-xl border border-[var(--leaf)]/30 bg-[var(--leaf)]/5 p-4">
             <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t("w2w_potential_income")}</p>
             {lastAlert ? (
               <>
@@ -275,11 +267,11 @@ export function WasteToWealthPanel() {
             )}
           </div>
 
-          <div className="space-y-3 rounded-2xl border border-amber-400/25 bg-amber-400/10 p-4">
+          <div className="space-y-3 rounded-xl border border-[var(--gold)]/30 bg-[var(--gold)]/10 p-4">
             <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t("w2w_b2b_matches")}</p>
             <div className="space-y-2">
               {previewMatches.map((m) => (
-                <div key={m.industryType} className="rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/40 p-3">
+                <div key={m.industryType} className="rounded-lg border border-[var(--border)] bg-[var(--background)] p-3">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium">{m.industryName}</p>
                     <Badge variant="secondary">{m.suitabilityScore}/100</Badge>
@@ -334,7 +326,7 @@ export function WasteToWealthPanel() {
                             ? 80
                             : 100;
                   return (
-                    <div key={lot.lotId} className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4">
+                    <div key={lot.lotId} className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="text-sm font-medium">{lot.industryName}</p>
@@ -366,11 +358,11 @@ export function WasteToWealthPanel() {
             <CardDescription>{t("w2w_eco_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
               <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t("w2w_total_secondary")}</p>
               <p className="mt-2 text-3xl font-semibold tabular-nums">{formatINR(ecoTotals.income)}</p>
             </div>
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+            <div className="rounded-xl border border-[var(--leaf)]/30 bg-[var(--leaf)]/5 p-4">
               <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t("w2w_co2_avoided")}</p>
               <p className="mt-2 text-3xl font-semibold tabular-nums">
                 {Math.round(ecoTotals.saved).toLocaleString("en-IN")} kg
@@ -381,7 +373,7 @@ export function WasteToWealthPanel() {
             </div>
 
             {lots[0] && (
-              <div className="rounded-2xl border border-amber-400/25 bg-amber-400/10 p-4">
+              <div className="rounded-xl border border-[var(--gold)]/30 bg-[var(--gold)]/10 p-4">
                 <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t("w2w_latest_qr")}</p>
                 <div className="mt-3 flex justify-center">
                   <QrCode value={lots[0].qrPayload} size={170} />

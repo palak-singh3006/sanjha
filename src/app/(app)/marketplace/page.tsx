@@ -44,7 +44,7 @@ const demoBuyerId = process.env.NEXT_PUBLIC_SANJHA_DEMO_BUYER_USER_ID?.trim();
 export default function MarketplacePage() {
   const [bid, setBid] = useState<Record<string, string>>({});
   const [listings, setListings] = useState<Listing[]>(fallbackListings);
-  const [source, setSource] = useState<"live" | "demo" | null>(null);
+  const [, setSource] = useState<"live" | "demo" | null>(null);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
@@ -129,13 +129,7 @@ export default function MarketplacePage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{t("market_title")}</h1>
-        <p className="mt-2 max-w-3xl text-[var(--foreground)]/65">{t("market_sub")}</p>
-        {source && (
-          <p className="mt-2 text-xs text-[var(--foreground)]/50">
-            {source === "live" ? "Connected: public.listings from Supabase." : "Demo fallback (API error or empty DB)."}
-            {loading ? " Refreshing…" : ""}
-          </p>
-        )}
+        {loading && <p className="mt-2 text-xs text-[var(--foreground)]/50">Refreshing…</p>}
         {notice && <p className="mt-2 text-sm text-amber-600 dark:text-amber-300">{notice}</p>}
       </div>
 
@@ -148,7 +142,7 @@ export default function MarketplacePage() {
           <CardContent className="flex flex-wrap items-center gap-2 text-sm">
             {chainRoles.map((key, i) => (
               <span key={key} className="flex items-center gap-2">
-                <span className="rounded-lg bg-red-500/15 px-2 py-1 text-red-200">{t(key)}</span>
+                <span className="rounded-md bg-stone-200/70 dark:bg-stone-800/70 px-2.5 py-1 text-xs font-medium text-stone-700 dark:text-stone-300">{t(key)}</span>
                 {i < chainRoles.length - 1 && (
                   <ArrowRight className="h-4 w-4 text-[var(--foreground)]/40" />
                 )}
@@ -156,17 +150,17 @@ export default function MarketplacePage() {
             ))}
           </CardContent>
         </Card>
-        <Card glass className="border-emerald-500/25">
+        <Card glass className="border-[var(--leaf)]/40">
           <CardHeader>
             <CardTitle>{t("market_sanj_title")}</CardTitle>
             <CardDescription>{t("market_sanj_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="rounded-lg bg-emerald-500/20 px-2 py-1 text-emerald-100">
+            <span className="rounded-md bg-[var(--forest)]/10 px-2.5 py-1 text-xs font-medium text-[var(--forest)] dark:text-[var(--leaf)]">
               {t("market_role_farmer")}
             </span>
             <ArrowRight className="h-4 w-4 text-[var(--foreground)]/40" />
-            <span className="rounded-lg bg-amber-400/20 px-2 py-1 text-amber-950 dark:text-amber-100">
+            <span className="rounded-md bg-[var(--gold)]/15 px-2.5 py-1 text-xs font-medium text-[var(--gold)]">
               {t("market_label_buyer")}
             </span>
             <Badge variant="gold" className="ml-auto">

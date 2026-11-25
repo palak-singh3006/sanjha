@@ -6,12 +6,10 @@ export const en: Dict = {
   nav_crop_intel: "Crop Intel",
   nav_market: "Marketplace",
   nav_copilot: "AI Copilot",
-  nav_community: "Community",
   nav_soil: "Soil Recovery",
   nav_map: "Cluster Map",
   nav_profile: "Profile",
   nav_buyer: "Buyer Hub",
-  nav_admin: "Admin",
   nav_login: "Sign in",
   cta_start: "Start Farming Smarter",
   cta_demo: "Watch Demo",
@@ -44,16 +42,15 @@ export const en: Dict = {
     "“140 farmers already growing tomatoes. Consider onions or chilli for higher profits.”",
 
   dash_title: "Smart Crop Coordination",
-  dash_sub:
-    "Prevent synchronized oversupply — treat the cluster as one network.",
+  dash_sub: "",
   dash_badge_cluster: "Live cluster intelligence",
   dash_stat_farmers: "Farmers networked",
   dash_stat_crops: "Active crops tracked",
   dash_stat_tomato: "Tomato saturation",
   dash_chart_title: "Demand vs supply (district buyers)",
-  dash_chart_desc: "Animated forecast — saturation risk when supply spikes.",
+  dash_chart_desc: "",
   dash_ai_title: "AI recommendation",
-  dash_ai_desc: "Example output for your cluster.",
+  dash_ai_desc: "",
   dash_ai_suggested: "Suggested pivot",
   dash_ai_saturation: "Market saturation (tomato)",
   dash_demo_ai:
@@ -73,11 +70,10 @@ export const en: Dict = {
   dash_threshold_title: "Threshold",
   dash_threshold_desc: "Alerts fire at {tons}t.",
   dash_crop_dist_title: "Crop distribution heat (cluster)",
-  dash_crop_dist_desc: "Microcharts — export to district heatmaps in production.",
+  dash_crop_dist_desc: "",
 
   market_title: "Direct Marketplace",
-  market_sub:
-    "Zero middlemen. Farmers list, buyers bid in real time, logistics and chat connect to Supabase in production.",
+  market_sub: "",
   market_trad_title: "Traditional chain",
   market_trad_desc: "Margin leak at every hop.",
   market_role_farmer: "Farmer",
@@ -87,7 +83,7 @@ export const en: Dict = {
   market_sanj_title: "Sanjha chain",
   market_sanj_desc: "Transparent pricing + live bids.",
   market_label_buyer: "Buyer",
-  market_uplift: "+18–31% farmer uplift (demo)",
+  market_uplift: "+18–31% farmer uplift",
   market_qty: "Quantity",
   market_floor: "Floor price",
   market_bid_ph: "Your bid ₹/kg",
@@ -96,29 +92,17 @@ export const en: Dict = {
   common_trust: "Trust",
 
   copilot_title: "AI Copilot",
-  copilot_sub:
-    "Multilingual voice loop: Web Speech API and /api/ai (OpenAI or Anthropic when keys exist, graceful offline copy otherwise). Responses cached to IndexedDB for low connectivity.",
+  copilot_sub: "",
   copilot_help_title: "Connect live AI",
   copilot_help_desc: "Works without API keys — demo Kannada and Hindi strings.",
   copilot_help_body:
     "Add OPENAI_API_KEY or ANTHROPIC_API_KEY in .env.local to route to live models.",
 
-  comm_title: "Community Knowledge Hub",
-  comm_sub:
-    "Threads, credibility, and fast answers. GPS-tagged insights and microclimate filters can map to Supabase PostGIS later.",
-  comm_search_title: "Search",
-  comm_search_ex: "Example: “Tomato leaf curl in Kolar”",
-  comm_search_ph: "Search crop, pest, region…",
-  comm_voice_bonus: "Voice notes",
-  comm_upvotes: "upvotes",
-  comm_success: "Success",
-  comm_validated: "Validated by",
 
   soil_title: "Soil Recovery & Next Crop",
-  soil_sub:
-    "Heuristic NPK depletion without IoT — transparent math in code, with a path to plug soil sensors later.",
+  soil_sub: "",
   soil_inputs: "Inputs",
-  soil_inputs_desc: "Previous crop, soil, method, weeks since harvest.",
+  soil_inputs_desc: "",
   soil_prev_crop: "Previous crop",
   soil_soil_type: "Soil type",
   soil_method: "Farming method",
@@ -130,10 +114,10 @@ export const en: Dict = {
   soil_opt_organic: "Organic",
   soil_opt_mixed: "Mixed",
   soil_opt_conventional: "Conventional",
-  soil_save_btn: "Save to Supabase (wire in production)",
+  soil_save_btn: "Save to Supabase",
   soil_est_title: "Estimated nutrient draw",
   soil_est_desc: "Recovery timeline + next crop profit band.",
-  soil_iot_badge: "Future-ready for IoT",
+  soil_iot_badge: "",
   soil_n: "Nitrogen (est.)",
   soil_p: "Phosphorus (est.)",
   soil_k: "Potassium (est.)",
@@ -147,14 +131,13 @@ export const en: Dict = {
   soil_label_next: "Next crop plan:",
 
   map_title: "Cluster Map",
-  map_sub:
-    "React Leaflet map with farm markers, harvest risk coloring, and overlays for waste pooling zones (demo data).",
+  map_sub: "",
   map_waste_title: "Waste pooling radar",
   map_waste_desc: "Aggregate spoilage into buyer-ready lots.",
   map_waste_body:
     "Threshold alerts unlock exporters when pooled organic mass crosses configured tonnage — see Dashboard for economics.",
   map_popup_risk: "Harvest risk:",
-  map_overlay_tip: "Waste pooling overlay · Weather layer (demo)",
+  map_overlay_tip: "Waste pooling overlay · Weather layer",
 
   profile_title: "Profile & Onboarding",
   profile_sub:
@@ -174,33 +157,20 @@ export const en: Dict = {
   profile_eco_co2: "CO2e avoided",
 
   buyer_title: "Buyer Dashboard",
-  buyer_sub:
-    "Procurement view: fraud signals (trust score), logistics milestones, and multilingual notifications (Twilio SMS hook ready).",
+  buyer_sub: "",
   buyer_rfq: "Open RFQs",
-  buyer_rfq_desc: "Live from marketplace service.",
+  buyer_rfq_desc: "",
   buyer_transit: "In transit",
-  buyer_transit_desc: "Cold chain hooks.",
+  buyer_transit_desc: "",
   buyer_fraud: "Fraud watch",
-  buyer_fraud_desc: "Trust-weighted bids.",
+  buyer_fraud_desc: "",
   buyer_watch_title: "Watchlist lots",
-  buyer_watch_desc: "Same demo listings as farmer view.",
+  buyer_watch_desc: "",
   buyer_target: "Target buy:",
 
-  admin_title: "Admin Analytics",
-  admin_sub:
-    "Control tower — animated charts, waste pooled, profit lift, and village leaderboard.",
-  admin_farmers: "Farmers on platform",
-  admin_crops: "Crops tracked",
-  admin_waste: "Waste pooled (tons)",
-  admin_profit: "Avg profit lift %",
-  admin_trend_title: "Demand trends (export + domestic)",
-  admin_trend_desc: "Bar chart animation.",
-  admin_top_v_title: "Top villages",
-  admin_top_v_desc: "Cluster performance score.",
 
   login_title: "Sign in",
-  login_sub:
-    "Supabase Auth when environment variables exist — otherwise a configuration hint is shown.",
+  login_sub: "",
   login_welcome: "Welcome back",
   login_welcome_desc: "Farmer, buyer, or coordinator accounts.",
   login_continue: "Continue",
@@ -216,9 +186,8 @@ export const en: Dict = {
   login_ok_demo: "Demo mode active — offline features are enabled.",
 
   voice_title: "Voice AI Copilot",
-  voice_sub:
-    "Speak in your language — glowing mic, waveform, transcript, and spoken replies.",
-  voice_ws_badge: "Web Speech API",
+  voice_sub: "",
+  voice_ws_badge: "",
   voice_live_label: "Live transcript",
   voice_ask: "Ask AI (typed or voice transcript)",
   voice_thinking: "Thinking…",
@@ -239,10 +208,6 @@ export const en: Dict = {
   shell_aria_language: "Language",
   common_unit_kg: "kg",
 
-  comm_voice_notes_badge: "Voice notes (bonus)",
-  comm_upvotes_count: "{count} upvotes",
-  comm_success_pct: "Success {pct}%",
-  comm_validated_farmers: "Validated by {count} farmers",
 
   market_listing_bids: "{count} active bids · queued sync when offline (IndexedDB)",
   market_trust_label: "Trust {n}",
@@ -267,9 +232,8 @@ export const en: Dict = {
   buyer_target_line: "Target buy: ₹{price}/kg · {qty} {unit} available",
 
   w2w_title: "Waste-to-Wealth",
-  w2w_sub:
-    "Log a harvest and instantly see hidden residue value, local B2B matches, and eco-credit.",
-  w2w_badge_new: "New",
+  w2w_sub: "",
+  w2w_badge_new: "",
   w2w_harvest_log: "Harvest log",
   w2w_farm: "Farm",
   w2w_crop: "Crop",
@@ -295,11 +259,10 @@ export const en: Dict = {
   w2w_lot_size_line: "Lot size: {size} · {count} harvest logs",
   w2w_advance_stage: "Advance stage",
   w2w_eco_title: "Eco-Credit Dashboard",
-  w2w_eco_desc:
-    "Carbon savings + value totals to strengthen subsidy / green certification profile.",
+  w2w_eco_desc: "",
   w2w_total_secondary: "Total secondary value",
   w2w_co2_avoided: "CO2e avoided",
   w2w_co2_note:
-    "Based on diverted residues vs open burning (demo factors). Integrate verified factors for certification.",
+    "Based on diverted residues vs open burning.",
   w2w_latest_qr: "Latest lot QR",
 };

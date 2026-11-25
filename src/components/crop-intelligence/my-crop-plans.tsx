@@ -64,16 +64,16 @@ export function MyCropPlans({ onEditPlan, refreshKey }: MyCropPlansProps) {
   const totalAcreage = plans.reduce((s, p) => s + Number(p.acreage), 0);
 
   return (
-    <Card glass className="border-[var(--foreground)]/15">
+    <Card glass>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-emerald-500" />
+              <Calendar className="h-5 w-5 text-[var(--forest)] dark:text-[var(--leaf)]" />
               My Registered Crop Plans
             </CardTitle>
             <CardDescription>
-              Your individual farm crop records stored privately in Supabase.
+              Your individual farm crop records.
             </CardDescription>
           </div>
           {plans.length > 0 && (
@@ -101,9 +101,9 @@ export function MyCropPlans({ onEditPlan, refreshKey }: MyCropPlansProps) {
             <span>{error}</span>
           </div>
         ) : plans.length === 0 ? (
-          <div className="py-10 text-center rounded-2xl border border-dashed border-[var(--foreground)]/15 p-6">
-            <div className="mx-auto w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-3">
-              <Sparkles className="h-6 w-6 text-emerald-500" />
+          <div className="py-10 text-center rounded-xl border border-dashed border-[var(--border)] p-6">
+            <div className="mx-auto w-12 h-12 rounded-full bg-[var(--leaf)]/10 flex items-center justify-center mb-3">
+              <Sparkles className="h-6 w-6 text-[var(--forest)] dark:text-[var(--leaf)]" />
             </div>
             <h3 className="text-base font-semibold">No crop plans registered yet</h3>
             <p className="mt-1 text-xs text-[var(--foreground)]/60 max-w-sm mx-auto">
@@ -115,14 +115,14 @@ export function MyCropPlans({ onEditPlan, refreshKey }: MyCropPlansProps) {
             {plans.map((p) => (
               <div
                 key={p.id}
-                className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4 flex flex-col justify-between hover:border-emerald-500/30 transition-colors"
+                className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 flex flex-col justify-between hover:border-[var(--leaf)]/40 transition-colors"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-semibold text-base capitalize">{p.crop_name}</h4>
                       <div className="flex items-center gap-1.5 text-xs text-[var(--foreground)]/60 mt-0.5">
-                        <MapPin className="h-3 w-3" />
+                        <MapPin className="h-3 w-3 text-[var(--forest)] dark:text-[var(--leaf)]" />
                         <span>{p.village}</span>
                         <span>·</span>
                         <span className="capitalize">{SEASON_LABELS[p.season as Season] || p.season}</span>
@@ -141,13 +141,13 @@ export function MyCropPlans({ onEditPlan, refreshKey }: MyCropPlansProps) {
                   )}
 
                   {p.notes && (
-                    <p className="mt-2 text-xs italic text-[var(--foreground)]/60 border-t border-[var(--foreground)]/10 pt-2">
+                    <p className="mt-2 text-xs italic text-[var(--foreground)]/60 border-t border-[var(--border)] pt-2">
                       “{p.notes}”
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center justify-end gap-2 mt-4 pt-2 border-t border-[var(--foreground)]/10">
+                <div className="flex items-center justify-end gap-2 mt-4 pt-2 border-t border-[var(--border)]">
                   {onEditPlan && (
                     <Button
                       size="sm"

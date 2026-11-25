@@ -53,7 +53,6 @@ export default function LoginPage() {
     <div className="mx-auto max-w-md space-y-6">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight">{t("login_title")}</h1>
-        <p className="mt-2 text-[var(--foreground)]/65">{t("login_sub")}</p>
       </div>
       <Card glass>
         <CardHeader>
@@ -82,7 +81,7 @@ export default function LoginPage() {
             {t("login_continue_demo")}
           </Button>
           {msg && <p className="text-sm text-[var(--foreground)]/70">{msg}</p>}
-          <Link href="/dashboard" className="block text-center text-sm text-emerald-600 dark:text-emerald-300">
+          <Link href="/dashboard" className="block text-center text-sm text-[var(--forest)] dark:text-[var(--leaf)] hover:underline">
             {t("login_skip")}
           </Link>
         </CardContent>

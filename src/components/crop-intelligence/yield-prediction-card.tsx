@@ -76,19 +76,19 @@ export function YieldPredictionCard() {
   }
 
   return (
-    <Card glass className="border-[var(--foreground)]/15">
+    <Card glass>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <CardTitle className="text-xl flex items-center gap-2">
-              <BrainCircuit className="h-5 w-5 text-emerald-500" />
+              <BrainCircuit className="h-5 w-5 text-[var(--forest)] dark:text-[var(--leaf)]" />
               Machine Learning Crop Yield Estimator (Prototype)
             </CardTitle>
             <CardDescription>
               Experimental model trained on synthetic data. Not validated for real-world yield prediction.
             </CardDescription>
           </div>
-          <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/10 w-fit">
+          <Badge variant="outline" className="border-amber-700/30 text-amber-800 dark:text-amber-300 bg-amber-500/10 w-fit">
             Experimental Prototype (Synthetic Data)
           </Badge>
         </div>
@@ -105,7 +105,7 @@ export function YieldPredictionCard() {
                 <select
                   value={crop}
                   onChange={(e) => setCrop(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm text-[var(--foreground)] capitalize outline-none"
+                  className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] capitalize outline-none"
                 >
                   {SUPPORTED_ML_CROPS.map((c) => (
                     <option key={c} value={c} className="bg-[var(--background)] capitalize">
@@ -122,7 +122,7 @@ export function YieldPredictionCard() {
                 <select
                   value={season}
                   onChange={(e) => setSeason(e.target.value as Season)}
-                  className="w-full h-10 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm text-[var(--foreground)] outline-none"
+                  className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] outline-none"
                 >
                   {SEASONS.map((s) => (
                     <option key={s} value={s} className="bg-[var(--background)]">
@@ -139,7 +139,7 @@ export function YieldPredictionCard() {
                 <select
                   value={soilType}
                   onChange={(e) => setSoilType(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm text-[var(--foreground)] capitalize outline-none"
+                  className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] capitalize outline-none"
                 >
                   {SOIL_TYPES.map((st) => (
                     <option key={st} value={st} className="bg-[var(--background)] capitalize">
@@ -239,7 +239,7 @@ export function YieldPredictionCard() {
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4 mr-2 text-emerald-400" />
+                  <Sparkles className="h-4 w-4 mr-2" />
                   Predict Yield (ML)
                 </>
               )}
@@ -247,11 +247,11 @@ export function YieldPredictionCard() {
           </form>
 
           {/* Results Output */}
-          <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-5">
+          <div className="lg:col-span-5 flex flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--card)] p-5">
             {result ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-500 flex items-center gap-1">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--forest)] dark:text-[var(--leaf)] flex items-center gap-1">
                     <CheckCircle2 className="h-4 w-4" />
                     Prediction Ready
                   </span>
@@ -264,7 +264,7 @@ export function YieldPredictionCard() {
                   <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">
                     Estimated Yield
                   </p>
-                  <p className="text-3xl font-bold tracking-tight text-emerald-500 mt-1 tabular-nums">
+                  <p className="text-3xl font-bold tracking-tight text-[var(--forest)] dark:text-[var(--leaf)] mt-1 tabular-nums">
                     {result.predicted_yield_kg_per_acre.toLocaleString()}{" "}
                     <span className="text-sm font-normal text-[var(--foreground)]/70">
                       kg / acre
@@ -275,19 +275,19 @@ export function YieldPredictionCard() {
                   </p>
                 </div>
 
-                <div className="space-y-1.5 pt-2 border-t border-[var(--foreground)]/10 text-xs">
+                <div className="space-y-1.5 pt-2 border-t border-[var(--border)] text-xs">
                   <div className="flex justify-between text-[var(--foreground)]/60">
                     <span>Model Architecture</span>
                     <span className="font-medium text-[var(--foreground)]/90">Gradient Boosting (scikit-learn)</span>
                   </div>
                   <div className="flex justify-between text-[var(--foreground)]/60">
                     <span>Dataset Status</span>
-                    <span className="text-amber-500 font-medium">100% Synthetic Data</span>
+                    <span className="text-[var(--gold)] font-medium">100% Synthetic Data</span>
                   </div>
                 </div>
 
-                <div className="text-[11px] space-y-1.5 text-[var(--foreground)]/70 pt-2 border-t border-[var(--foreground)]/10">
-                  <p className="font-semibold text-amber-600 dark:text-amber-400">
+                <div className="text-[11px] space-y-1.5 text-[var(--foreground)]/70 pt-2 border-t border-[var(--border)]">
+                  <p className="font-semibold text-amber-800 dark:text-amber-300">
                     Experimental model trained on synthetic data. Not validated for real-world yield prediction.
                   </p>
                   <p className="italic text-[var(--foreground)]/60">
@@ -305,7 +305,7 @@ export function YieldPredictionCard() {
               </div>
             )}
 
-            <div className="mt-4 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] flex items-start gap-1.5">
+            <div className="mt-4 p-2.5 rounded-lg bg-amber-500/10 border border-amber-600/20 text-amber-800 dark:text-amber-200 text-[11px] flex items-start gap-1.5">
               <Info className="h-3.5 w-3.5 shrink-0 mt-0.5" />
               <span>
                 <strong>Mandatory Disclaimer:</strong> Experimental model trained on synthetic data. Not validated for real-world yield prediction. Do not use for actual farm planning.

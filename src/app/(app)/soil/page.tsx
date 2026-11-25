@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import {
   estimateSoilReport,
   type FarmMethod,
@@ -48,7 +47,6 @@ export default function SoilPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{t("soil_title")}</h1>
-        <p className="mt-2 max-w-3xl text-[var(--foreground)]/65">{t("soil_sub")}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -65,7 +63,7 @@ export default function SoilPage() {
             <label className="block text-sm">
               <span className="text-[var(--foreground)]/60">{t("soil_soil_type")}</span>
               <select
-                className="mt-1 flex h-11 w-full rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 px-3 text-sm"
+                className="mt-1 flex h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-sm"
                 value={soilType}
                 onChange={(e) => setSoilType(e.target.value as SoilType)}
               >
@@ -79,7 +77,7 @@ export default function SoilPage() {
             <label className="block text-sm">
               <span className="text-[var(--foreground)]/60">{t("soil_method")}</span>
               <select
-                className="mt-1 flex h-11 w-full rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 px-3 text-sm"
+                className="mt-1 flex h-10 w-full rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 text-sm"
                 value={method}
                 onChange={(e) => setMethod(e.target.value as FarmMethod)}
               >
@@ -107,12 +105,11 @@ export default function SoilPage() {
         </Card>
 
         <Card glass className="lg:col-span-2">
-          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+          <CardHeader>
             <div>
               <CardTitle>{t("soil_est_title")}</CardTitle>
               <CardDescription>{t("soil_est_desc")}</CardDescription>
             </div>
-            <Badge variant="gold">{t("soil_iot_badge")}</Badge>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid gap-4 sm:grid-cols-3">
@@ -121,7 +118,7 @@ export default function SoilPage() {
                 { k: "soil_p", v: report.phosphorus },
                 { k: "soil_k", v: report.potassium },
               ].map((x) => (
-                <div key={x.k} className="rounded-2xl border border-[var(--foreground)]/10 p-4">
+                <div key={x.k} className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
                   <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">{t(x.k)}</p>
                   <p className="mt-2 text-3xl font-semibold tabular-nums">{Math.round(x.v)}%</p>
                   <Progress value={x.v} className="mt-3" />
@@ -129,7 +126,7 @@ export default function SoilPage() {
               ))}
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4 text-sm">
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)]/30 p-4 text-sm">
                 <p className="text-xs uppercase tracking-wider text-[var(--foreground)]/50">
                   {t("soil_stress")}
                 </p>
@@ -139,7 +136,7 @@ export default function SoilPage() {
                   {tReplace("soil_recovery_line", { weeks: report.recoveryWeeks })}
                 </p>
               </div>
-              <div className="space-y-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm">
+              <div className="space-y-3 rounded-xl border border-[var(--leaf)]/30 bg-[var(--leaf)]/5 p-4 text-sm">
                 <p>
                   <strong>{t("soil_label_compost")}</strong> {report.compostSuggestion}
                 </p>
@@ -155,7 +152,7 @@ export default function SoilPage() {
                 <p>
                   <strong>{t("soil_label_next")}</strong> {report.nextCrop}
                 </p>
-                <p className="text-emerald-800 dark:text-emerald-100/90">{report.profitBand}</p>
+                <p className="text-[var(--forest)] dark:text-[var(--leaf)] font-medium">{report.profitBand}</p>
               </div>
             </div>
           </CardContent>

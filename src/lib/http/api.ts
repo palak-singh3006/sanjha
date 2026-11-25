@@ -93,23 +93,3 @@ export async function apiAcceptBid(body: { bidId: string; listingId: string }) {
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
-
-export async function apiKnowledge(params?: { crop?: string; region?: string; pest?: string }) {
-  const q = new URLSearchParams();
-  if (params?.crop) q.set("crop", params.crop);
-  if (params?.region) q.set("region", params.region);
-  if (params?.pest) q.set("pest", params.pest);
-  const res = await fetch(`/api/knowledge?${q}`);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-export async function apiCreateKnowledgePost(body: Record<string, unknown>) {
-  const res = await fetch("/api/knowledge", {
-    method: "POST",
-    headers: jsonHeaders,
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error((await res.json()).error ?? res.statusText);
-  return res.json();
-}

@@ -45,9 +45,6 @@ export default function CropIntelligencePage() {
               AI & ML Module
             </Badge>
           </div>
-          <p className="mt-2 max-w-3xl text-[var(--foreground)]/65 leading-relaxed">
-            Collaborative agricultural planning across village clusters. Analyse community crop concentration, mitigate market crash risks, and test an experimental prototype ML model for yield estimation.
-          </p>
         </div>
       </div>
 

@@ -111,7 +111,7 @@ Question: ${englishText}`;
       englishReply =
         "Check Market tab for current mandi prices. You can list your produce to get direct bids from buyers.";
     } else if (query.includes("pest") || query.includes("disease")) {
-      englishReply = `Search Community Hub for ${crop} pest solutions from farmers in ${district}.`;
+      englishReply = `Consult local agricultural extension or fellow farmers for ${crop} pest solutions in ${district}.`;
     } else {
       englishReply =
         "I can help with weather, harvest timing, market prices, pests, and soil health. What do you need?";

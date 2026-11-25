@@ -6,12 +6,10 @@ export const hi: Dict = {
   nav_dashboard: "डैशबोर्ड",
   nav_market: "बाज़ार",
   nav_copilot: "AI सहायक",
-  nav_community: "समुदाय",
   nav_soil: "मिट्टी पुनर्स्थापन",
   nav_map: "क्लस्टर मानचित्र",
   nav_profile: "प्रोफ़ाइल",
   nav_buyer: "खरीदार केंद्र",
-  nav_admin: "विश्लेषण",
   nav_login: "साइन इन",
   cta_start: "स्मार्ट खेती शुरू करें",
   cta_demo: "डेमो देखें",
@@ -44,16 +42,15 @@ export const hi: Dict = {
     "“140 किसान पहले से टमाटर उगा रहे हैं। ज़्यादा मुनाफे के लिए प्याज़ या मिर्च पर विचार करें।”",
 
   dash_title: "स्मार्ट फसल समन्वय",
-  dash_sub:
-    "एक साथ ज़्यादा आपूर्ति रोकें — क्लस्टर को एक नेटवर्क मानें।",
+  dash_sub: "",
   dash_badge_cluster: "लाइव क्लस्टर बुद्धिमत्ता",
   dash_stat_farmers: "जुड़े किसान",
   dash_stat_crops: "ट्रैक की गई फसलें",
   dash_stat_tomato: "टमाटर संतृप्ति",
   dash_chart_title: "माँग बनाम आपूर्ति (ज़िला खरीदार)",
-  dash_chart_desc: "एनिमेटेड पूर्वानुमान — आपूर्ति बढ़ने पर संतृप्ति जोखिम।",
+  dash_chart_desc: "",
   dash_ai_title: "AI सिफारिश",
-  dash_ai_desc: "आपके क्लस्टर के लिए उदाहरण आउटपुट।",
+  dash_ai_desc: "",
   dash_ai_suggested: "सुझाया बदलाव",
   dash_ai_saturation: "बाज़ार संतृप्ति (टमाटर)",
   dash_demo_ai:
@@ -73,11 +70,10 @@ export const hi: Dict = {
   dash_threshold_title: "सीमा",
   dash_threshold_desc: "चेतावनी {tons}t पर।",
   dash_crop_dist_title: "फसल वितरण (क्लस्टर)",
-  dash_crop_dist_desc: "माइक्रो चार्ट — उत्पादन में ज़िला हीटमैप।",
+  dash_crop_dist_desc: "",
 
   market_title: "प्रत्यक्ष बाज़ार",
-  market_sub:
-    "बिना दलाल। किसान सूची बनाते हैं, खरीदार रीयल-टाइम बोली लगाते हैं, लॉजिस्टिक्स Supabase से जुड़ेगा।",
+  market_sub: "",
   market_trad_title: "पारंपरिक श्रृंखला",
   market_trad_desc: "हर कदम पर मार्जिन रिसाव।",
   market_role_farmer: "किसान",
@@ -96,29 +92,17 @@ export const hi: Dict = {
   common_trust: "विश्वास",
 
   copilot_title: "AI सहायक",
-  copilot_sub:
-    "बहुभाषी आवाज़: Web Speech API और /api/ai। कुंजी होने पर OpenAI या Anthropic। कम नेट पर IndexedDB कैश।",
+  copilot_sub: "",
   copilot_help_title: "लाइव AI जोड़ें",
   copilot_help_desc: "API कुंजी के बिना चलता है — हिंदी/कन्नड़ डेमो।",
   copilot_help_body:
     "लाइव मॉडल के लिए .env.local में OPENAI_API_KEY या ANTHROPIC_API_KEY जोड़ें।",
 
-  comm_title: "सामुदायिक ज्ञान केंद्र",
-  comm_sub:
-    "चर्चा, विश्वसनीयता, तेज़ उत्तर। GPS अंतर्दृष्टि बाद में PostGIS से जोड़ सकते हैं।",
-  comm_search_title: "खोज",
-  comm_search_ex: "उदाहरण: “कोलार में टमाटर पत्ता मरोड़”",
-  comm_search_ph: "फसल, कीट, क्षेत्र खोजें…",
-  comm_voice_bonus: "आवाज़ नोट",
-  comm_upvotes: "समर्थन",
-  comm_success: "सफलता",
-  comm_validated: "इतने किसानों ने सत्यापित किया",
 
   soil_title: "मिट्टी रिकवरी और अगली फसल",
-  soil_sub:
-    "IoT के बिना अनुमानित NPK — कोड में पारदर्शी गणना, बाद में सेंसर जोड़ सकते हैं।",
+  soil_sub: "",
   soil_inputs: "इनपुट",
-  soil_inputs_desc: "पिछली फसल, मिट्टी, विधि, कटाई के बाद सप्ताह।",
+  soil_inputs_desc: "",
   soil_prev_crop: "पिछली फसल",
   soil_soil_type: "मिट्टी प्रकार",
   soil_method: "खेती विधि",
@@ -133,7 +117,7 @@ export const hi: Dict = {
   soil_save_btn: "Supabase में सहेजें (उत्पादन में तार)",
   soil_est_title: "अनुमानित पोषक तत्व",
   soil_est_desc: "रिकवरी समय + अगली फसल लाभ बैंड।",
-  soil_iot_badge: "IoT के लिए तैयार",
+  soil_iot_badge: "",
   soil_n: "नाइट्रोजन (अनुमान)",
   soil_p: "फॉस्फोरस (अनुमान)",
   soil_k: "पोटैश (अनुमान)",
@@ -147,8 +131,7 @@ export const hi: Dict = {
   soil_label_next: "अगली फसल योजना:",
 
   map_title: "क्लस्टर मानचित्र",
-  map_sub:
-    "React Leaflet — खेत मार्कर, कटाई जोखिम रंग, अपशिष्ट ज़ोन (डेमो)।",
+  map_sub: "",
   map_waste_title: "अपशिष्ट पूलिंग रडार",
   map_waste_desc: "खराब माल को खरीदार-तैयार लॉट में।",
   map_waste_body:
@@ -170,32 +153,20 @@ export const hi: Dict = {
   profile_queue_btn: "डेमो सूची ऑफ़लाइन कतार करें",
 
   buyer_title: "खरीदार डैशबोर्ड",
-  buyer_sub:
-    "खरीद दृश्य: धोखाधड़ी संकेत, लॉजिस्टिक्स, बहुभाषी SMS (Twilio)।",
+  buyer_sub: "",
   buyer_rfq: "खुले RFQ",
-  buyer_rfq_desc: "बाज़ार सेवा से लाइव।",
+  buyer_rfq_desc: "",
   buyer_transit: "रास्ते में",
-  buyer_transit_desc: "कोल्ड चेन हुक।",
+  buyer_transit_desc: "",
   buyer_fraud: "धोखाधड़ी निगरानी",
-  buyer_fraud_desc: "विश्वास-भारित बोलियाँ।",
+  buyer_fraud_desc: "",
   buyer_watch_title: "वॉचलिस्ट लॉट",
-  buyer_watch_desc: "किसान दृश्य जैसी डेमो सूचियाँ।",
+  buyer_watch_desc: "",
   buyer_target: "लक्ष्य खरीद:",
 
-  admin_title: "विश्लेषण",
-  admin_sub: "चार्ट, पूल अपशिष्ट, लाभ, शीर्ष गाँव।",
-  admin_farmers: "प्लेटफ़ॉर्म किसान",
-  admin_crops: "ट्रैक फसलें",
-  admin_waste: "पूल अपशिष्ट (टन)",
-  admin_profit: "औसत लाभ वृद्धि %",
-  admin_trend_title: "माँग रुझान (निर्यात + घरेलू)",
-  admin_trend_desc: "बार चार्ट एनीमेशन।",
-  admin_top_v_title: "शीर्ष गाँव",
-  admin_top_v_desc: "क्लस्टर स्कोर।",
 
   login_title: "साइन इन",
-  login_sub:
-    "पर्यावरण चर होने पर Supabase Auth — नहीं तो संकेत।",
+  login_sub: "",
   login_welcome: "वापसी पर स्वागत",
   login_welcome_desc: "किसान, खरीदार, या समन्वयक।",
   login_continue: "जारी रखें",
@@ -205,9 +176,8 @@ export const hi: Dict = {
   login_ok_session: "साइन इन — सत्र Supabase डैशबोर्ड में देखें।",
 
   voice_title: "आवाज़ AI सहायक",
-  voice_sub:
-    "अपनी भाषा में बोलें — माइक, तरंग, ट्रांसक्रिप्ट, बोला हुआ उत्तर।",
-  voice_ws_badge: "Web Speech API",
+  voice_sub: "",
+  voice_ws_badge: "",
   voice_live_label: "लाइव ट्रांसक्रिप्ट",
   voice_ask: "AI से पूछें (टाइप या आवाज़)",
   voice_thinking: "सोच रहा है…",

@@ -41,7 +41,7 @@ interface CommunityDashboardProps {
   refreshTrigger?: number;
 }
 
-const CROP_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ec4899", "#8b5cf6", "#14b8a6", "#f97316"];
+const CROP_COLORS = ["#244B38", "#72916A", "#B8864B", "#D4A373", "#5B665E", "#8A9A86", "#6F4E37"];
 
 export function CommunityDashboard({
   onGoToRegister,
@@ -124,20 +124,20 @@ export function CommunityDashboard({
   function getConcentrationBadge(level: string, pct: number) {
     if (level === "high") {
       return (
-        <Badge variant="outline" className="border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/10">
+        <Badge variant="outline" className="border-amber-700/30 text-amber-800 dark:text-amber-300 bg-amber-500/10">
           High Concentration ({pct}%)
         </Badge>
       );
     }
     if (level === "moderate") {
       return (
-        <Badge variant="outline" className="border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10">
+        <Badge variant="outline" className="border-amber-600/20 text-amber-700 dark:text-amber-400 bg-amber-500/5">
           Moderate Concentration ({pct}%)
         </Badge>
       );
     }
     return (
-      <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10">
+      <Badge variant="outline" className="border-[var(--leaf)]/40 text-[var(--forest)] dark:text-[var(--leaf)] bg-[var(--leaf)]/10">
         Balanced Diversification ({pct}%)
       </Badge>
     );
@@ -146,7 +146,7 @@ export function CommunityDashboard({
   return (
     <div className="space-y-6">
       {/* Top Filter Bar */}
-      <Card glass className="border-[var(--foreground)]/15">
+      <Card glass>
         <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             {/* Village Selector */}
@@ -157,7 +157,7 @@ export function CommunityDashboard({
               <select
                 value={village}
                 onChange={(e) => setVillage(e.target.value)}
-                className="h-9 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm font-medium text-[var(--foreground)] outline-none"
+                className="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm font-medium text-[var(--foreground)] outline-none"
               >
                 {villagesList.map((v) => (
                   <option key={v} value={v} className="bg-[var(--background)]">
@@ -175,7 +175,7 @@ export function CommunityDashboard({
               <select
                 value={season}
                 onChange={(e) => setSeason(e.target.value as Season)}
-                className="h-9 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm font-medium text-[var(--foreground)] outline-none"
+                className="h-9 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm font-medium text-[var(--foreground)] outline-none"
               >
                 {SEASONS.map((s) => (
                   <option key={s} value={s} className="bg-[var(--background)]">
@@ -237,7 +237,7 @@ export function CommunityDashboard({
         <>
           {/* Key Stat Cards */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card glass className="border-[var(--foreground)]/10">
+            <Card glass>
               <CardHeader className="pb-2">
                 <CardDescription className="text-xs uppercase font-medium tracking-wider">
                   Total Planned Land
@@ -247,12 +247,12 @@ export function CommunityDashboard({
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 text-xs text-[var(--foreground)]/60 flex items-center gap-1">
-                <Layers className="h-3.5 w-3.5 text-emerald-500" />
+                <Layers className="h-3.5 w-3.5 text-[var(--forest)] dark:text-[var(--leaf)]" />
                 <span>Across all reporting farms</span>
               </CardContent>
             </Card>
 
-            <Card glass className="border-[var(--foreground)]/10">
+            <Card glass>
               <CardHeader className="pb-2">
                 <CardDescription className="text-xs uppercase font-medium tracking-wider">
                   Reporting Farmers
@@ -262,12 +262,12 @@ export function CommunityDashboard({
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 text-xs text-[var(--foreground)]/60 flex items-center gap-1">
-                <Users className="h-3.5 w-3.5 text-emerald-500" />
+                <Users className="h-3.5 w-3.5 text-[var(--forest)] dark:text-[var(--leaf)]" />
                 <span>In {insight.village} ({SEASON_LABELS[insight.season as Season] || insight.season})</span>
               </CardContent>
             </Card>
 
-            <Card glass className="border-[var(--foreground)]/10">
+            <Card glass>
               <CardHeader className="pb-2">
                 <CardDescription className="text-xs uppercase font-medium tracking-wider">
                   Dominant Planned Crop
@@ -277,7 +277,7 @@ export function CommunityDashboard({
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 text-xs text-[var(--foreground)]/60 flex items-center gap-1">
-                <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                <TrendingUp className="h-3.5 w-3.5 text-[var(--forest)] dark:text-[var(--leaf)]" />
                 <span>
                   {insight.concentration_pct > 0
                     ? `${insight.concentration_pct}% of planned land`
@@ -286,7 +286,7 @@ export function CommunityDashboard({
               </CardContent>
             </Card>
 
-            <Card glass className="border-[var(--foreground)]/10">
+            <Card glass>
               <CardHeader className="pb-2">
                 <CardDescription className="text-xs uppercase font-medium tracking-wider">
                   Concentration Level
@@ -303,11 +303,11 @@ export function CommunityDashboard({
 
           {/* Privacy Threshold Notice if < 5 farmers */}
           {!insight.meets_privacy_threshold && (
-            <Card glass className="border-amber-500/20 bg-amber-500/5">
+            <Card glass className="border-amber-600/30 bg-amber-500/5">
               <CardContent className="p-4 flex items-start gap-3">
-                <ShieldAlert className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <h4 className="font-semibold text-amber-600 dark:text-amber-400">
+                  <h4 className="font-semibold text-amber-700 dark:text-amber-300">
                     Privacy Protection Active (Minimum {PRIVACY_MIN_FARMERS} Farmers Required)
                   </h4>
                   <p className="mt-1 text-xs text-[var(--foreground)]/70 leading-relaxed">
@@ -329,10 +329,10 @@ export function CommunityDashboard({
           {insight.meets_privacy_threshold && insight.crop_stats.length > 0 ? (
             <div className="grid gap-6 lg:grid-cols-12">
               {/* Distribution Chart */}
-              <Card glass className="lg:col-span-7 border-[var(--foreground)]/10">
+              <Card glass className="lg:col-span-7">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-emerald-500" />
+                    <TrendingUp className="h-5 w-5 text-[var(--forest)] dark:text-[var(--leaf)]" />
                     Crop Acreage Distribution ({insight.village})
                   </CardTitle>
                   <CardDescription>
@@ -345,23 +345,24 @@ export function CommunityDashboard({
                       <BarChart data={insight.crop_stats} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                         <XAxis
                           dataKey="crop_name"
-                          stroke="rgba(148,163,184,0.6)"
+                          stroke="var(--muted-foreground)"
                           fontSize={12}
                           tickLine={false}
                           interval={0}
                         />
-                        <YAxis stroke="rgba(148,163,184,0.6)" fontSize={12} tickLine={false} />
+                        <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
                         <Tooltip
                           contentStyle={{
-                            background: "rgba(12,24,20,0.92)",
-                            border: "1px solid rgba(255,255,255,0.1)",
-                            borderRadius: 12,
-                            color: "#fff",
+                            background: "var(--card)",
+                            border: "1px solid var(--border)",
+                            borderRadius: 8,
+                            color: "var(--foreground)",
                             fontSize: 12,
+                            boxShadow: "0 1px 3px 0 rgba(0,0,0,0.05)",
                           }}
                           formatter={(value) => [`${value} acres`, "Acreage"]}
                         />
-                        <Bar dataKey="total_acreage" radius={[6, 6, 0, 0]}>
+                        <Bar dataKey="total_acreage" radius={[4, 4, 0, 0]}>
                           {insight.crop_stats.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={CROP_COLORS[index % CROP_COLORS.length]} />
                           ))}
@@ -401,10 +402,10 @@ export function CommunityDashboard({
               {/* Concentration Analysis & Recommendations */}
               <div className="lg:col-span-5 space-y-4">
                 {/* Risk Explanation */}
-                <Card glass className="border-[var(--foreground)]/10">
+                <Card glass>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      <AlertTriangle className="h-4 w-4 text-[var(--gold)]" />
                       Concentration Analysis & Heuristics
                     </CardTitle>
                     <CardDescription className="text-xs">
@@ -425,10 +426,10 @@ export function CommunityDashboard({
                       </div>
                     </div>
 
-                    <div className="space-y-2 pt-2 border-t border-[var(--foreground)]/10">
+                    <div className="space-y-2 pt-2 border-t border-[var(--border)]">
                       {insight.risk_reasons.map((r, i) => (
                         <p key={i} className="text-xs text-[var(--foreground)]/70 flex items-start gap-1.5 leading-relaxed">
-                          <span className="text-amber-500 font-bold">•</span>
+                          <span className="text-[var(--gold)] font-bold">•</span>
                           <span>{r}</span>
                         </p>
                       ))}
@@ -437,10 +438,10 @@ export function CommunityDashboard({
                 </Card>
 
                 {/* Recommendations */}
-                <Card glass className="border-emerald-500/20 bg-emerald-500/5">
+                <Card glass className="border-[var(--leaf)]/30 bg-[var(--leaf)]/5">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                      <Lightbulb className="h-4 w-4 text-emerald-500" />
+                    <CardTitle className="text-base flex items-center gap-2 text-[var(--forest)] dark:text-[var(--leaf)]">
+                      <Lightbulb className="h-4 w-4 text-[var(--forest)] dark:text-[var(--leaf)]" />
                       Community Diversification Opportunities
                     </CardTitle>
                     <CardDescription className="text-xs">
@@ -451,7 +452,7 @@ export function CommunityDashboard({
                     <ul className="space-y-2.5 text-xs text-[var(--foreground)]/80">
                       {insight.recommendations.map((rec, i) => (
                         <li key={i} className="flex items-start gap-2 leading-relaxed">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                          <CheckCircle2 className="h-4 w-4 text-[var(--forest)] dark:text-[var(--leaf)] shrink-0 mt-0.5" />
                           <span>{rec}</span>
                         </li>
                       ))}

@@ -3,7 +3,7 @@
 import { useState, useEffect, startTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SEASONS, SEASON_LABELS, type Season, type FarmOption, type CropPlan } from "@/features/crop-intelligence/types";
 import { CheckCircle2, AlertCircle, Loader2, Sparkles } from "lucide-react";
@@ -154,32 +154,29 @@ export function CropPlanForm({ onPlanCreated, editingPlan, onCancelEdit }: CropP
   }
 
   return (
-    <Card glass className="border-[var(--foreground)]/15">
+    <Card glass>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-emerald-500" />
+            <Sparkles className="h-5 w-5 text-[var(--forest)] dark:text-[var(--leaf)]" />
             {editingPlan ? "Edit Crop Plan" : "Register Crop Plan"}
           </CardTitle>
           <Badge variant="gold">
             {editingPlan ? "Updating" : "New Plan"}
           </Badge>
         </div>
-        <CardDescription>
-          Record your intended crop allocations so the community can identify diversification opportunities and prevent market oversupply.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMessage && (
-            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm flex items-start gap-2">
               <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm flex items-start gap-2">
+            <div className="p-3 rounded-lg bg-[var(--leaf)]/10 border border-[var(--leaf)]/30 text-[var(--forest)] dark:text-[var(--leaf)] text-sm flex items-start gap-2">
               <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />
               <span>{successMessage}</span>
             </div>
@@ -192,12 +189,12 @@ export function CropPlanForm({ onPlanCreated, editingPlan, onCancelEdit }: CropP
                 Your Farm
               </label>
               {loadingFarms ? (
-                <div className="h-10 rounded-xl bg-[var(--foreground)]/5 animate-pulse" />
+                <div className="h-10 rounded-lg bg-[var(--foreground)]/5 animate-pulse" />
               ) : farms.length > 0 ? (
                 <select
                   value={farmId}
                   onChange={(e) => setFarmId(e.target.value)}
-                  className="w-full h-10 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm text-[var(--foreground)] outline-none"
+                  className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] outline-none"
                 >
                   {farms.map((f) => {
                     const displayAcres = f.area_acres ?? f.acres;
@@ -270,7 +267,7 @@ export function CropPlanForm({ onPlanCreated, editingPlan, onCancelEdit }: CropP
               <select
                 value={season}
                 onChange={(e) => setSeason(e.target.value as Season)}
-                className="w-full h-10 px-3 rounded-xl border border-[var(--foreground)]/15 bg-[var(--foreground)]/5 text-sm text-[var(--foreground)] outline-none"
+                className="w-full h-10 px-3 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--foreground)] outline-none"
               >
                 {SEASONS.map((s) => (
                   <option key={s} value={s} className="bg-[var(--background)]">

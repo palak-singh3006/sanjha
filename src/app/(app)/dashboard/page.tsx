@@ -17,7 +17,6 @@ import { clusterStats, cropDistribution, harvestRows, wastePool } from "@/lib/de
 import { Sparkles, TrendingUp } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
 import { WasteToWealthPanel } from "@/components/waste-to-wealth/waste-to-wealth-panel";
-import { ApiSmokeTest } from "@/components/dev/api-smoke-test";
 
 const demandSupply = [
   { week: "W1", demand: 42, supply: 38 },
@@ -42,7 +41,7 @@ export default function DashboardPage() {
             {t("dash_title")}
           </motion.h1>
           <p className="mt-2 max-w-2xl text-[var(--foreground)]/65">
-            {clusterStats.village} · {clusterStats.district}. {t("dash_sub")}
+            {clusterStats.village} · {clusterStats.district}
           </p>
         </div>
         <Badge variant="gold" className="w-fit gap-1 py-1.5">
@@ -80,7 +79,7 @@ export default function DashboardPage() {
         <Card glass className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-emerald-400" />
+              <TrendingUp className="h-5 w-5 text-[var(--forest)] dark:text-[var(--leaf)]" />
               {t("dash_chart_title")}
             </CardTitle>
             <CardDescription>{t("dash_chart_desc")}</CardDescription>
@@ -90,28 +89,31 @@ export default function DashboardPage() {
               <AreaChart data={demandSupply}>
                 <defs>
                   <linearGradient id="d" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#34d399" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#34d399" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#244B38" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="#244B38" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#fbbf24" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#B8864B" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="#B8864B" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.15)" />
-                <XAxis dataKey="week" stroke="rgba(148,163,184,0.5)" />
-                <YAxis stroke="rgba(148,163,184,0.5)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.6} />
+                <XAxis dataKey="week" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
                 <Tooltip
                   contentStyle={{
-                    background: "rgba(12,24,20,0.92)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 12,
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    color: "var(--foreground)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                   }}
                 />
                 <Area
                   type="monotone"
                   dataKey="demand"
-                  stroke="#34d399"
+                  stroke="#244B38"
                   fillOpacity={1}
                   fill="url(#d)"
                   strokeWidth={2}
@@ -119,7 +121,7 @@ export default function DashboardPage() {
                 <Area
                   type="monotone"
                   dataKey="supply"
-                  stroke="#fbbf24"
+                  stroke="#B8864B"
                   fillOpacity={1}
                   fill="url(#s)"
                   strokeWidth={2}
@@ -135,7 +137,7 @@ export default function DashboardPage() {
             <CardDescription>{t("dash_ai_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 to-transparent p-4 text-sm leading-relaxed">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--muted)]/40 p-4 text-sm leading-relaxed">
               {clusterStats.aiLine}
             </div>
             <div>
@@ -166,7 +168,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 + i * 0.05 }}
-              className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4"
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4"
             >
               <p className="text-sm font-medium">{h.farm}</p>
               <p className="mt-2 text-xs text-[var(--foreground)]/55">{h.weather}</p>
@@ -182,7 +184,7 @@ export default function DashboardPage() {
                 </div>
                 <Progress value={h.marketPressure} />
               </div>
-              <p className="mt-3 text-sm font-semibold text-emerald-600 dark:text-emerald-300">
+              <p className="mt-3 text-sm font-semibold text-[var(--forest)] dark:text-[var(--leaf)]">
                 {h.date}
               </p>
               <p className="mt-1 text-xs text-[var(--foreground)]/55">
@@ -210,7 +212,7 @@ export default function DashboardPage() {
                 })}
               </p>
             </div>
-            <div className="max-w-md rounded-2xl border border-amber-400/25 bg-amber-400/10 p-4 text-sm">
+            <div className="max-w-md rounded-xl border border-[var(--gold)]/30 bg-[var(--gold)]/10 p-4 text-sm">
               {wastePool.message}
             </div>
           </CardContent>
@@ -232,16 +234,6 @@ export default function DashboardPage() {
 
       <Card glass>
         <CardHeader>
-          <CardTitle>API connectivity</CardTitle>
-          <CardDescription>Smoke-test backend routes against your Supabase and external services.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ApiSmokeTest />
-        </CardContent>
-      </Card>
-
-      <Card glass>
-        <CardHeader>
           <CardTitle>{t("dash_crop_dist_title")}</CardTitle>
           <CardDescription>{t("dash_crop_dist_desc")}</CardDescription>
         </CardHeader>
@@ -252,7 +244,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.05 }}
-              className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4"
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4"
             >
               <div className="flex items-center justify-between text-sm">
                 <span>{c.name}</span>
