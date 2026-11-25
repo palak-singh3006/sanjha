@@ -11,7 +11,6 @@ export default function MapPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{t("map_title")}</h1>
-        <p className="mt-2 max-w-3xl text-[var(--foreground)]/65">{t("map_sub")}</p>
       </div>
       <ClusterMapLazy />
       <Card glass>

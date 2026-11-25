@@ -10,11 +10,11 @@ export const clusterStats = {
 };
 
 export const cropDistribution = [
-  { name: "Tomato", value: 38, fill: "#ef4444" },
-  { name: "Onion", value: 18, fill: "#a78bfa" },
-  { name: "Chilli", value: 14, fill: "#f97316" },
-  { name: "Toor", value: 12, fill: "#22c55e" },
-  { name: "Other", value: 18, fill: "#38bdf8" },
+  { name: "Tomato", value: 38, fill: "#244B38" },
+  { name: "Onion", value: 18, fill: "#72916A" },
+  { name: "Chilli", value: 14, fill: "#B8864B" },
+  { name: "Toor", value: 12, fill: "#D4A373" },
+  { name: "Other", value: 18, fill: "#5B665E" },
 ];
 
 export const harvestRows = [
@@ -74,47 +74,12 @@ export const listings = [
   },
 ];
 
-export const communityPosts = [
-  {
-    id: "p1",
-    title: "Tomato leaf curl — what worked in Kolar",
-    crop: "Tomato",
-    region: "Kolar",
-    upvotes: 214,
-    success: 78,
-    validations: 36,
-    excerpt: "Neem oil 5% + sticky traps + remove infected leaves early...",
-  },
-  {
-    id: "p2",
-    title: "False smut in paddy after unseasonal rain",
-    crop: "Rice",
-    region: "Raichur",
-    upvotes: 156,
-    success: 64,
-    validations: 22,
-    excerpt: "Propiconazole schedule we used + drainage trenches...",
-  },
-];
-
 export const wastePool = {
   qtyTons: 2.4,
   valueINR: 186000,
   threshold: 2.0,
   buyersUnlocked: 3,
   message: "Cluster crossed 2 tons organic waste. Buyer unlocked.",
-};
-
-export const adminStats = {
-  farmers: 12840,
-  crops: 37,
-  wasteTons: 942,
-  profitLift: 23,
-  topVillages: [
-    { name: "Hunasagi", score: 96 },
-    { name: "Shorapur", score: 91 },
-    { name: "Sindagi", score: 88 },
-  ],
 };
 
 export const mapFarms = [

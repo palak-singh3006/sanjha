@@ -13,7 +13,6 @@ export default function BuyerPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{t("buyer_title")}</h1>
-        <p className="mt-2 max-w-3xl text-[var(--foreground)]/65">{t("buyer_sub")}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -30,7 +29,7 @@ export default function BuyerPage() {
             <CardDescription>{t("buyer_transit_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center gap-2 text-4xl font-semibold">
-            6 <Truck className="h-8 w-8 text-emerald-400" />
+            6 <Truck className="h-8 w-8 text-[var(--forest)] dark:text-[var(--leaf)]" />
           </CardContent>
         </Card>
         <Card glass>
@@ -38,7 +37,7 @@ export default function BuyerPage() {
             <CardTitle>{t("buyer_fraud")}</CardTitle>
             <CardDescription>{t("buyer_fraud_desc")}</CardDescription>
           </CardHeader>
-          <CardContent className="text-4xl font-semibold text-emerald-400">0.3%</CardContent>
+          <CardContent className="text-4xl font-semibold text-[var(--forest)] dark:text-[var(--leaf)]">0.3%</CardContent>
         </Card>
       </div>
 
@@ -51,7 +50,7 @@ export default function BuyerPage() {
           {listings.map((l) => (
             <div
               key={l.id}
-              className="rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-4"
+              className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="font-medium">{l.crop}</p>
