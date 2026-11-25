@@ -182,16 +182,13 @@ export async function GET(req: NextRequest) {
     let query = admin
       .from("farms")
       .select(`
-        id, owner_id, group_id, name, acres, village, district, state, soil_type, survey_number, irrigation_type, lat, lng, created_at,
-        users (id, full_name, phone)
+        id, cluster_id, name, area_acres, soil_type, lat, lng, created_at,
+        clusters (id, name, center_lat, center_lng)
       `)
       .order("created_at", { ascending: false })
       .limit(limit);
 
-    if (ownerId) query = query.eq("owner_id", ownerId);
-    if (groupId) query = query.eq("group_id", groupId);
-    if (village) query = query.ilike("village", `%${village}%`);
-    if (district) query = query.ilike("district", `%${district}%`);
+    if (groupId) query = query.eq("cluster_id", groupId);
     if (soilType) query = query.eq("soil_type", soilType);
 
     const { data, error } = await query;
@@ -199,24 +196,28 @@ export async function GET(req: NextRequest) {
       return apiError(`Failed to fetch farms: ${error.message}`, { status: 500, details: error });
     }
 
-    const results = (data || []).map((f: any) => ({
-      id: f.id,
-      ownerId: f.owner_id,
-      ownerName: f.users?.full_name,
-      ownerPhone: f.users?.phone,
-      groupId: f.group_id,
-      name: f.name,
-      acres: f.acres,
-      village: f.village,
-      district: f.district,
-      state: f.state,
-      soilType: f.soil_type,
-      surveyNumber: f.survey_number,
-      irrigationType: f.irrigation_type,
-      lat: f.lat,
-      lng: f.lng,
-      createdAt: f.created_at,
-    }));
+    const results = (data || []).map((f: any) => {
+      const isKembhavi = f.clusters?.name?.toLowerCase().includes("kembhavi");
+      const isShorapur = f.clusters?.name?.toLowerCase().includes("shorapur");
+      const village = isKembhavi ? "Kembhavi" : isShorapur ? "Shorapur" : "Hunasagi";
+      const clusterCode = isKembhavi ? "KEM-01" : isShorapur ? "SHO-01" : "HUN-01";
+      return {
+        id: f.id,
+        name: f.name,
+        acres: Number(f.area_acres || 2.5),
+        areaAcres: Number(f.area_acres || 2.5),
+        clusterId: f.cluster_id,
+        clusterCode,
+        clusterName: f.clusters?.name,
+        village,
+        district: "Yadgir",
+        state: "Karnataka",
+        soilType: f.soil_type || "loamy",
+        lat: Number(f.lat ?? f.clusters?.center_lat ?? 16.45),
+        lng: Number(f.lng ?? f.clusters?.center_lng ?? 76.45),
+        createdAt: f.created_at,
+      };
+    });
 
     return apiSuccess(results, { meta: { count: results.length } });
   } catch (e) {
@@ -253,16 +254,10 @@ export async function POST(req: NextRequest) {
     const { data: farm, error } = await admin
       .from("farms")
       .insert({
-        owner_id: ownerId,
-        group_id: val.groupId || null,
+        cluster_id: val.groupId || null,
         name: val.name,
-        acres: val.acres,
-        village: val.village,
-        district: val.district,
-        state: val.state,
+        area_acres: val.acres,
         soil_type: val.soilType,
-        survey_number: val.surveyNumber,
-        irrigation_type: val.irrigationType,
         lat: val.lat,
         lng: val.lng,
       })

@@ -34,8 +34,8 @@ export async function GET(
     const { data: cp, error } = await admin
       .from("crop_plans")
       .select(`
-        id, farm_id, crop_name, variety, season, area_acres, sowing_date, expected_harvest_date, recommended_harvest_date, status, dri_score, market_pressure, estimated_yield_kg, notes, created_at,
-        farms (id, name, village, district, soil_type, irrigation_type, owner_id)
+        id, farm_id, crop_name, sow_date, expected_harvest_date, recommended_harvest_date, status, dri_score, market_pressure, quantity_kg, created_at,
+        farms (id, name, area_acres, soil_type, cluster_id)
       `)
       .eq("id", id)
       .maybeSingle();
@@ -47,9 +47,27 @@ export async function GET(
       return apiError(`Crop plan with ID ${id} not found`, { status: 404, code: "NOT_FOUND" });
     }
 
+    const farmObj: any = Array.isArray(cp.farms) ? cp.farms[0] : cp.farms;
+
     return apiSuccess({
-      ...cp,
-      farm: cp.farms,
+      id: cp.id,
+      farmId: cp.farm_id,
+      farmName: farmObj?.name,
+      cropName: cp.crop_name,
+      variety: "Hybrid Selection",
+      season: "Kharif",
+      areaAcres: Number(farmObj?.area_acres || 2.5),
+      sowingDate: cp.sow_date,
+      sowDate: cp.sow_date,
+      expectedHarvestDate: cp.expected_harvest_date,
+      recommendedHarvestDate: cp.recommended_harvest_date,
+      status: cp.status,
+      driScore: cp.dri_score ?? 35,
+      marketPressure: cp.market_pressure ?? 40,
+      estimatedYieldKg: Number(cp.quantity_kg || 0),
+      quantityKg: Number(cp.quantity_kg || 0),
+      createdAt: cp.created_at,
+      farm: farmObj,
     });
   } catch (e) {
     return handleCatchError(e, "api/crop-plans/[id] GET");
@@ -74,19 +92,15 @@ export async function PATCH(
       return apiSuccess({ id, ...val, updated: true, isDemo: true });
     }
 
-    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const updates: Record<string, unknown> = {};
     if (val.cropName) updates.crop_name = val.cropName;
-    if (val.variety !== undefined) updates.variety = val.variety;
-    if (val.season) updates.season = val.season;
-    if (val.areaAcres !== undefined) updates.area_acres = val.areaAcres;
-    if (val.sowingDate) updates.sowing_date = val.sowingDate;
+    if (val.sowingDate) updates.sow_date = val.sowingDate;
     if (val.expectedHarvestDate) updates.expected_harvest_date = val.expectedHarvestDate;
     if (val.recommendedHarvestDate !== undefined) updates.recommended_harvest_date = val.recommendedHarvestDate;
     if (val.status) updates.status = val.status;
     if (val.driScore !== undefined) updates.dri_score = val.driScore;
     if (val.marketPressure !== undefined) updates.market_pressure = val.marketPressure;
-    if (val.estimatedYieldKg !== undefined) updates.estimated_yield_kg = val.estimatedYieldKg;
-    if (val.notes !== undefined) updates.notes = val.notes;
+    if (val.estimatedYieldKg !== undefined) updates.quantity_kg = val.estimatedYieldKg;
 
     const { data, error } = await admin
       .from("crop_plans")

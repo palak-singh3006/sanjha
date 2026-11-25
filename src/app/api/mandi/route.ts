@@ -90,7 +90,16 @@ export async function GET(req: NextRequest) {
       try {
         const admin = getSupabaseAdminOptional();
         if (admin) {
-          await admin.from("mandi_prices").insert(prices);
+          const dbRows = prices.map((p: any) => ({
+            crop_name: p.crop_name,
+            market_name: p.market_name,
+            state: p.state,
+            price_min: p.price_min,
+            price_max: p.price_max,
+            price_modal: p.price_modal,
+            date: p.date,
+          }));
+          await admin.from("mandi_prices").insert(dbRows);
         }
       } catch (e) {
         console.warn("[api/mandi] cache write skipped:", e);
@@ -125,9 +134,19 @@ export async function POST(req: NextRequest) {
       return apiSuccess({ count: recordsToInsert.length, isDemo: true }, { status: 201 });
     }
 
+    const sanitizedRows = recordsToInsert.map((r: any) => ({
+      crop_name: r.crop_name,
+      market_name: r.market_name,
+      state: r.state,
+      price_min: r.price_min,
+      price_max: r.price_max,
+      price_modal: r.price_modal,
+      date: r.date,
+    }));
+
     const { data, error } = await admin
       .from("mandi_prices")
-      .insert(recordsToInsert)
+      .insert(sanitizedRows)
       .select();
 
     if (error) {

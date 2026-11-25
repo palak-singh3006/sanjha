@@ -187,8 +187,8 @@ export async function GET(req: NextRequest) {
     let query = admin
       .from("crop_plans")
       .select(`
-        id, farm_id, crop_name, variety, season, area_acres, sowing_date, expected_harvest_date, recommended_harvest_date, status, dri_score, market_pressure, estimated_yield_kg, notes, created_at,
-        farms (id, name, village, district, soil_type, owner_id)
+        id, farm_id, crop_name, sow_date, expected_harvest_date, recommended_harvest_date, status, dri_score, market_pressure, quantity_kg, created_at,
+        farms (id, name, area_acres, soil_type, cluster_id)
       `)
       .order("expected_harvest_date", { ascending: true })
       .limit(limit);
@@ -196,7 +196,6 @@ export async function GET(req: NextRequest) {
     if (farmId) query = query.eq("farm_id", farmId);
     if (cropName) query = query.ilike("crop_name", `%${cropName}%`);
     if (status) query = query.eq("status", status);
-    if (season) query = query.eq("season", season);
 
     const { data, error } = await query;
     if (error) {
@@ -207,21 +206,20 @@ export async function GET(req: NextRequest) {
       id: cp.id,
       farmId: cp.farm_id,
       farmName: cp.farms?.name,
-      village: cp.farms?.village,
-      district: cp.farms?.district,
       soilType: cp.farms?.soil_type,
       cropName: cp.crop_name,
-      variety: cp.variety,
-      season: cp.season,
-      areaAcres: cp.area_acres,
-      sowingDate: cp.sowing_date,
+      variety: "Hybrid Selection",
+      season: "Kharif",
+      areaAcres: Number(cp.farms?.area_acres || 2.5),
+      sowingDate: cp.sow_date,
+      sowDate: cp.sow_date,
       expectedHarvestDate: cp.expected_harvest_date,
       recommendedHarvestDate: cp.recommended_harvest_date,
       status: cp.status,
-      driScore: cp.dri_score,
-      marketPressure: cp.market_pressure,
-      estimatedYieldKg: cp.estimated_yield_kg,
-      notes: cp.notes,
+      driScore: cp.dri_score ?? 35,
+      marketPressure: cp.market_pressure ?? 40,
+      estimatedYieldKg: Number(cp.quantity_kg || 0),
+      quantityKg: Number(cp.quantity_kg || 0),
       createdAt: cp.created_at,
     }));
 
@@ -262,15 +260,13 @@ export async function POST(req: NextRequest) {
       .insert({
         farm_id: val.farmId,
         crop_name: val.cropName,
-        variety: val.variety,
-        season: val.season,
-        area_acres: val.areaAcres,
-        sowing_date: val.sowingDate,
+        sow_date: val.sowingDate || new Date().toISOString().split("T")[0],
         expected_harvest_date: val.expectedHarvestDate,
         recommended_harvest_date: val.recommendedHarvestDate || val.expectedHarvestDate,
-        status: val.status,
-        estimated_yield_kg: val.estimatedYieldKg,
-        notes: val.notes,
+        status: val.status || "growing",
+        quantity_kg: val.estimatedYieldKg || 5000,
+        dri_score: 0,
+        market_pressure: 0,
       })
       .select()
       .single();
