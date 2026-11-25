@@ -77,7 +77,29 @@ export async function GET(req: NextRequest) {
     if (village) query = query.ilike("village", `%${village}%`);
     if (district) query = query.ilike("district", `%${district}%`);
 
-    const { data, error } = await query;
+    let { data, error } = await query;
+    if (error) {
+      // Fallback to `clusters` table if `farmer_groups` does not exist
+      try {
+        let clQuery = admin
+          .from("clusters")
+          .select("id, name, code, village, district, state, description, lat, lng, total_acres, created_at")
+          .order("created_at", { ascending: false })
+          .limit(limit);
+
+        if (village) clQuery = clQuery.ilike("village", `%${village}%`);
+        if (district) clQuery = clQuery.ilike("district", `%${district}%`);
+
+        const clRes = await clQuery;
+        if (!clRes.error && clRes.data) {
+          data = clRes.data as any;
+          error = null;
+        }
+      } catch {
+        // Continue to error return below
+      }
+    }
+
     if (error) {
       return apiError(`Failed to fetch groups: ${error.message}`, { status: 500, details: error });
     }

@@ -171,13 +171,33 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 1. Fetch Cluster details from Database
-    const { data: cluster } = await admin
-      .from("farmer_groups")
-      .select("id, name, code, village, district, total_acres")
-      .or(`code.eq.${clusterId},village.ilike.%${villageParam}%`)
-      .limit(1)
-      .maybeSingle();
+    // 1. Fetch Cluster details from Database (checks farmer_groups or clusters)
+    let cluster: any = null;
+    try {
+      const { data } = await admin
+        .from("farmer_groups")
+        .select("id, name, code, village, district, total_acres")
+        .or(`code.eq.${clusterId},village.ilike.%${villageParam}%`)
+        .limit(1)
+        .maybeSingle();
+      cluster = data;
+    } catch {
+      // Ignore error if view/table not present
+    }
+
+    if (!cluster) {
+      try {
+        const { data } = await admin
+          .from("clusters")
+          .select("id, name, code, village, district, total_acres")
+          .or(`code.eq.${clusterId},village.ilike.%${villageParam}%`)
+          .limit(1)
+          .maybeSingle();
+        cluster = data;
+      } catch {
+        // Fallback to cluster profile if neither exists
+      }
+    }
 
     // 2. Count registered farmers in this cluster
     let farmerCount = profile.farmersCount;
