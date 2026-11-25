@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const admin = getSupabaseAdminOptional();
     if (!admin) {
-      return apiSuccess([
+      const allGroups = [
         {
           id: "b1000000-0000-0000-0000-000000000001",
           name: "Hunasagi Progressive Farmers Cluster",
@@ -26,9 +26,42 @@ export async function GET(req: NextRequest) {
           totalAcres: 142.5,
           lat: 16.45,
           lng: 76.45,
-          memberCount: 3,
+          memberCount: 84,
         },
-      ]);
+        {
+          id: "b1000000-0000-0000-0000-000000000002",
+          name: "Kembhavi Integrated Pulses & Cotton Cluster",
+          code: "KEM-01",
+          village: "Kembhavi",
+          district: "Yadgir",
+          state: "Karnataka",
+          description: "Cooperative red gram, bengal gram and Bt cotton cluster with shared farmgate sorting and APMC forward contracts.",
+          leaderName: "Mallikarjun Biradar",
+          totalAcres: 198.0,
+          lat: 16.664,
+          lng: 76.562,
+          memberCount: 68,
+        },
+        {
+          id: "b1000000-0000-0000-0000-000000000003",
+          name: "Shorapur Krishna Basin Paddy Cluster",
+          code: "SHO-01",
+          village: "Shorapur",
+          district: "Yadgir",
+          state: "Karnataka",
+          description: "Krishna canal command area cooperative focused on premium Sona Masoori paddy and groundnut rotation.",
+          leaderName: "Venkatesh Nayak",
+          totalAcres: 245.0,
+          lat: 16.520,
+          lng: 76.758,
+          memberCount: 96,
+        },
+      ];
+
+      let filtered = allGroups;
+      if (village) filtered = filtered.filter((g) => g.village.toLowerCase().includes(village.toLowerCase()));
+      if (district) filtered = filtered.filter((g) => g.district.toLowerCase().includes(district.toLowerCase()));
+      return apiSuccess(filtered);
     }
 
     let query = admin

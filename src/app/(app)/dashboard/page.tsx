@@ -110,15 +110,16 @@ export default function DashboardPage() {
   }, [clusterId]);
 
   // Interactive DRI Stagger simulation for a harvest row
-  async function handleStaggerHarvest(farmName: string) {
+  async function handleStaggerHarvest(h: any) {
+    const farmName = h.farm;
     setSimulatingPlot(farmName);
     try {
       const res = await apiDri({
-        farmId: "c1000000-0000-0000-0000-000000000001",
-        cropName: "Tomato",
+        farmId: h.farmId || (clusterId === "KEM-01" ? "c1000000-0000-0000-0000-000000000005" : clusterId === "SHO-01" ? "c1000000-0000-0000-0000-000000000008" : "c1000000-0000-0000-0000-000000000001"),
+        cropName: h.crop || (clusterId === "KEM-01" ? "Cotton" : clusterId === "SHO-01" ? "Paddy" : "Tomato"),
         clusterId,
-        expectedHarvestDate: new Date().toISOString().split("T")[0],
-        soilType: "loamy",
+        expectedHarvestDate: h.expectedDate || new Date().toISOString().split("T")[0],
+        soilType: clusterId === "KEM-01" ? "black" : clusterId === "SHO-01" ? "clay" : "loamy",
         cropPlanId: "d1000000-0000-0000-0000-000000000001",
       });
 
@@ -127,7 +128,7 @@ export default function DashboardPage() {
         [farmName]: {
           delayed: true,
           newDate: `Staggered to ${res.recommendedDate} (+${res.delayDays}d)`,
-          newRisk: Math.max(25, (res.dri ?? 42) - 20),
+          newRisk: Math.max(16, (res.dri ?? h.risk ?? 42) - 22),
         },
       }));
     } catch (e) {
@@ -172,6 +173,14 @@ export default function DashboardPage() {
               }`}
             >
               Kembhavi (KEM-01)
+            </button>
+            <button
+              onClick={() => setClusterId("SHO-01")}
+              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
+                clusterId === "SHO-01" ? "bg-emerald-500 text-white shadow-sm" : "text-[var(--foreground)]/70 hover:text-[var(--foreground)]"
+              }`}
+            >
+              Shorapur (SHO-01)
             </button>
           </div>
 
@@ -362,7 +371,7 @@ export default function DashboardPage() {
                     variant={plotStagger?.delayed ? "secondary" : "outline"}
                     className="w-full gap-1.5 text-xs"
                     disabled={simulatingPlot === h.farm || plotStagger?.delayed}
-                    onClick={() => handleStaggerHarvest(h.farm)}
+                    onClick={() => handleStaggerHarvest(h)}
                   >
                     <Sprout className={`h-3.5 w-3.5 ${simulatingPlot === h.farm ? "animate-spin text-emerald-400" : ""}`} />
                     {simulatingPlot === h.farm

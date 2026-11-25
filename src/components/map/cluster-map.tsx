@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { MapContainer, TileLayer, CircleMarker, Circle, Popup, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Circle, Popup, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useI18n } from "@/lib/i18n/provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { RefreshCw, Filter, Sprout, AlertTriangle, Layers, Calendar, CheckCircle2 } from "lucide-react";
+import { RefreshCw, Filter, Sprout, AlertTriangle, Layers, Calendar, CheckCircle2, MapPin, ShieldAlert, Sparkles } from "lucide-react";
 import { apiFarms, apiCropPlans, apiDri } from "@/lib/http/api";
-
-const center: [number, number] = [16.45, 76.45];
 
 interface MapFarmItem {
   id: string;
   name: string;
   ownerName?: string;
   village: string;
+  clusterCode: string;
   acres: number;
   soilType: string;
   lat: number;
@@ -31,12 +30,83 @@ interface MapFarmItem {
   risk: "high" | "med" | "low";
 }
 
+// Multi-cluster coordinate centers
+const clusterCoordinates: Record<string, { center: [number, number]; zoom: number; label: string }> = {
+  all: { center: [16.55, 76.58], zoom: 11, label: "All Clusters (Yadgir District)" },
+  "HUN-01": { center: [16.452, 76.448], zoom: 14, label: "Hunasagi Cluster (HUN-01)" },
+  "KEM-01": { center: [16.664, 76.562], zoom: 14, label: "Kembhavi Cluster (KEM-01)" },
+  "SHO-01": { center: [16.520, 76.758], zoom: 14, label: "Shorapur Cluster (SHO-01)" },
+};
+
+// Realistic geographic risk catchment zones
+interface RiskZone {
+  id: string;
+  name: string;
+  riskLevel: "high" | "med" | "low";
+  center: [number, number];
+  radius: number;
+  color: string;
+  driRange: string;
+  description: string;
+  dominantCrop: string;
+}
+
+const geographicRiskZones: RiskZone[] = [
+  {
+    id: "zone-hun-high",
+    name: "Hunasagi Central Basin: High Glut & Delay Risk Area",
+    riskLevel: "high",
+    center: [16.452, 76.448],
+    radius: 2400,
+    color: "#ef4444",
+    driRange: "DRI 72 - 85%",
+    description: "Critical tomato saturation (76%). High price collapse risk due to simultaneous harvest arriving in Hunasagi APMC yard.",
+    dominantCrop: "Tomato",
+  },
+  {
+    id: "zone-hun-med",
+    name: "Krishna Canal Belt: Moderate Moisture Watch Area",
+    riskLevel: "med",
+    center: [16.448, 76.456],
+    radius: 1800,
+    color: "#f59e0b",
+    driRange: "DRI 40 - 55%",
+    description: "High humidity along canal command. Onion and chilli drying requires 48hr dry window.",
+    dominantCrop: "Onion / Chilli",
+  },
+  {
+    id: "zone-kem-low",
+    name: "Kembhavi Uplands: High Resilience Diversified Safe Area",
+    riskLevel: "low",
+    center: [16.664, 76.562],
+    radius: 2800,
+    color: "#10b981",
+    driRange: "DRI 18 - 28%",
+    description: "Optimal climate resilience. Red gram, bengal gram and cotton diversified across black soil with steady APMC forward procurement.",
+    dominantCrop: "Pulses & Cotton",
+  },
+  {
+    id: "zone-sho-low",
+    name: "Shorapur Basin: Krishna Command Low Risk Area",
+    riskLevel: "low",
+    center: [16.520, 76.758],
+    radius: 2600,
+    color: "#06b6d4",
+    driRange: "DRI 24 - 32%",
+    description: "Canal-backed Sona Masoori paddy & groundnut. Stable procurement under government minimum support price (MSP).",
+    dominantCrop: "Paddy & Groundnut",
+  },
+];
+
+// Rich fallback farms across all three clusters with distinct risk profiles
 const defaultFarms: MapFarmItem[] = [
+  // Hunasagi Cluster (High & Medium Risk Tomato/Onion)
   {
     id: "c1000000-0000-0000-0000-000000000001",
     name: "Gowda South Field",
     ownerName: "Sharanappa Gowda",
     village: "Hunasagi",
+    clusterCode: "HUN-01",
     acres: 3.5,
     soilType: "loamy",
     lat: 16.452,
@@ -45,16 +115,17 @@ const defaultFarms: MapFarmItem[] = [
     variety: "Abhinav Hybrid",
     season: "Kharif",
     status: "growing",
-    driScore: 42,
+    driScore: 78,
     expectedHarvestDate: "2026-12-05",
-    recommendedHarvestDate: "2026-12-07",
-    risk: "med",
+    recommendedHarvestDate: "2026-12-09",
+    risk: "high",
   },
   {
     id: "c1000000-0000-0000-0000-000000000002",
     name: "Renuka Krishna Valley Farm",
     ownerName: "Renuka Devi",
     village: "Hunasagi",
+    clusterCode: "HUN-01",
     acres: 2.0,
     soilType: "clay",
     lat: 16.458,
@@ -65,7 +136,7 @@ const defaultFarms: MapFarmItem[] = [
     status: "harvest_ready",
     driScore: 72,
     expectedHarvestDate: "2026-12-01",
-    recommendedHarvestDate: "2026-12-03",
+    recommendedHarvestDate: "2026-12-04",
     risk: "high",
   },
   {
@@ -73,53 +144,165 @@ const defaultFarms: MapFarmItem[] = [
     name: "Basavaraj Canal Plot",
     ownerName: "Basavaraj Patil",
     village: "Hunasagi",
+    clusterCode: "HUN-01",
     acres: 4.2,
     soilType: "loamy",
-    lat: 16.448,
-    lng: 76.452,
+    lat: 16.446,
+    lng: 76.456,
     cropName: "Onion",
     variety: "Bhima Super",
     season: "Kharif",
     status: "growing",
-    driScore: 28,
-    expectedHarvestDate: "2026-12-25",
-    recommendedHarvestDate: "2026-12-25",
-    risk: "low",
+    driScore: 36,
+    expectedHarvestDate: "2026-12-18",
+    recommendedHarvestDate: "2026-12-18",
+    risk: "med",
   },
   {
     id: "c1000000-0000-0000-0000-000000000004",
-    name: "Sanjha Co-op Plot 4",
+    name: "Sanjha Co-op Tomato Plot",
     ownerName: "Cooperative Lot 4",
     village: "Hunasagi",
+    clusterCode: "HUN-01",
     acres: 5.0,
     soilType: "black",
     lat: 16.451,
-    lng: 76.446,
-    cropName: "Chilli",
-    variety: "Byadgi Kaddi",
+    lng: 76.442,
+    cropName: "Tomato",
+    variety: "Namdhari NS-501",
+    season: "Kharif",
+    status: "harvest_ready",
+    driScore: 82,
+    expectedHarvestDate: "2026-12-04",
+    recommendedHarvestDate: "2026-12-08",
+    risk: "high",
+  },
+
+  // Kembhavi Cluster (Low Risk Diversified Pulses & Cotton)
+  {
+    id: "c1000000-0000-0000-0000-000000000005",
+    name: "Patil Cotton Acreage",
+    ownerName: "Hanumantappa Pujari",
+    village: "Kembhavi",
+    clusterCode: "KEM-01",
+    acres: 4.8,
+    soilType: "black",
+    lat: 16.665,
+    lng: 76.561,
+    cropName: "Cotton",
+    variety: "Bt Cotton RCH-2",
     season: "Kharif",
     status: "growing",
-    driScore: 63,
-    expectedHarvestDate: "2026-12-12",
-    recommendedHarvestDate: "2026-12-15",
-    risk: "high",
+    driScore: 22,
+    expectedHarvestDate: "2026-12-14",
+    recommendedHarvestDate: "2026-12-14",
+    risk: "low",
+  },
+  {
+    id: "c1000000-0000-0000-0000-000000000006",
+    name: "Kembhavi Pulse Cooperative",
+    ownerName: "Kembhavi Raitha Sangha",
+    village: "Kembhavi",
+    clusterCode: "KEM-01",
+    acres: 6.0,
+    soilType: "loamy",
+    lat: 16.669,
+    lng: 76.568,
+    cropName: "Bengal Gram",
+    variety: "JG-11 (Chana)",
+    season: "Rabi",
+    status: "growing",
+    driScore: 18,
+    expectedHarvestDate: "2026-12-20",
+    recommendedHarvestDate: "2026-12-20",
+    risk: "low",
+  },
+  {
+    id: "c1000000-0000-0000-0000-000000000007",
+    name: "Mallikarjun Red Gram Plot",
+    ownerName: "Mallikarjun Biradar",
+    village: "Kembhavi",
+    clusterCode: "KEM-01",
+    acres: 3.2,
+    soilType: "red",
+    lat: 16.660,
+    lng: 76.556,
+    cropName: "Red Gram",
+    variety: "TS-3R (Maruti)",
+    season: "Kharif",
+    status: "growing",
+    driScore: 24,
+    expectedHarvestDate: "2026-12-28",
+    recommendedHarvestDate: "2026-12-28",
+    risk: "low",
+  },
+
+  // Shorapur Cluster (Low/Nominal Risk Paddy & Groundnut)
+  {
+    id: "c1000000-0000-0000-0000-000000000008",
+    name: "Shorapur Basin Paddy Farm",
+    ownerName: "Venkatesh Nayak",
+    village: "Shorapur",
+    clusterCode: "SHO-01",
+    acres: 5.5,
+    soilType: "clay",
+    lat: 16.522,
+    lng: 76.755,
+    cropName: "Paddy",
+    variety: "BPT 5204 (Sona Masoori)",
+    season: "Kharif",
+    status: "growing",
+    driScore: 26,
+    expectedHarvestDate: "2026-12-10",
+    recommendedHarvestDate: "2026-12-11",
+    risk: "low",
+  },
+  {
+    id: "c1000000-0000-0000-0000-000000000009",
+    name: "Raja Venkatappa Canal Plot",
+    ownerName: "Raja Venkatappa FPO",
+    village: "Shorapur",
+    clusterCode: "SHO-01",
+    acres: 4.0,
+    soilType: "loamy",
+    lat: 16.518,
+    lng: 76.762,
+    cropName: "Groundnut",
+    variety: "TMV-2",
+    season: "Kharif",
+    status: "growing",
+    driScore: 31,
+    expectedHarvestDate: "2026-12-16",
+    recommendedHarvestDate: "2026-12-16",
+    risk: "low",
   },
 ];
 
 const riskColor: Record<string, string> = {
-  high: "#f87171",
-  med: "#fbbf24",
-  low: "#4ade80",
+  high: "#ef4444",
+  med: "#f59e0b",
+  low: "#10b981",
 };
+
+// Helper component to pan/zoom map on cluster selection
+function MapController({ center, zoom }: { center: [number, number]; zoom: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, zoom, { duration: 1.2 });
+  }, [center, zoom, map]);
+  return null;
+}
 
 export function ClusterMap() {
   const { t } = useI18n();
   const [farms, setFarms] = useState<MapFarmItem[]>(defaultFarms);
   const [loading, setLoading] = useState(false);
   const [selectedFarm, setSelectedFarm] = useState<MapFarmItem | null>(defaultFarms[0]);
+  const [selectedCluster, setSelectedCluster] = useState<string>("all");
   const [cropFilter, setCropFilter] = useState<string>("all");
   const [riskFilter, setRiskFilter] = useState<string>("all");
-  const [showCatchment, setShowCatchment] = useState(true);
+  const [showRiskZones, setShowRiskZones] = useState(true);
+  const [showCatchment, setShowCatchment] = useState(false);
   const [driSimulating, setDriSimulating] = useState(false);
   const [simulationResult, setSimulationResult] = useState<{
     verdict?: string;
@@ -145,7 +328,7 @@ export function ClusterMap() {
             ? liveCrops.find((c: any) => c.farmId === f.id || c.farm_id === f.id)
             : null;
 
-          const dri = matchedCrop?.driScore ?? matchedCrop?.dri_score ?? (idx % 2 === 0 ? 42 : 68);
+          const dri = matchedCrop?.driScore ?? matchedCrop?.dri_score ?? (f.clusterCode === "HUN-01" ? 76 : 24);
           const risk: "high" | "med" | "low" = dri > 60 ? "high" : dri > 35 ? "med" : "low";
 
           return {
@@ -153,17 +336,18 @@ export function ClusterMap() {
             name: f.name || `Farm Plot ${idx + 1}`,
             ownerName: f.ownerName || f.users?.full_name || "Cluster Farmer",
             village: f.village || "Hunasagi",
-            acres: Number(f.acres) || 2.5,
+            clusterCode: f.clusterCode || (f.village?.toLowerCase().includes("kembhavi") ? "KEM-01" : f.village?.toLowerCase().includes("shorapur") ? "SHO-01" : "HUN-01"),
+            acres: Number(f.acres) || 3.0,
             soilType: f.soilType || f.soil_type || "loamy",
-            lat: Number(f.lat) || center[0] + (idx * 0.003 - 0.004),
-            lng: Number(f.lng) || center[1] + (idx * 0.003 - 0.002),
-            cropName: matchedCrop?.cropName || matchedCrop?.crop_name || "Tomato",
-            variety: matchedCrop?.variety || "Abhinav Hybrid",
+            lat: Number(f.lat) || (16.45 + idx * 0.003),
+            lng: Number(f.lng) || (76.45 + idx * 0.003),
+            cropName: matchedCrop?.cropName || matchedCrop?.crop_name || (f.clusterCode === "KEM-01" ? "Cotton" : f.clusterCode === "SHO-01" ? "Paddy" : "Tomato"),
+            variety: matchedCrop?.variety || "Hybrid",
             season: matchedCrop?.season || "Kharif",
             status: matchedCrop?.status || "growing",
             driScore: dri,
             expectedHarvestDate: matchedCrop?.expectedHarvestDate || matchedCrop?.expected_harvest_date || "2026-12-05",
-            recommendedHarvestDate: matchedCrop?.recommendedHarvestDate || matchedCrop?.recommended_harvest_date || "2026-12-07",
+            recommendedHarvestDate: matchedCrop?.recommendedHarvestDate || matchedCrop?.recommended_harvest_date || "2026-12-08",
             risk,
           };
         });
@@ -174,7 +358,7 @@ export function ClusterMap() {
         }
       }
     } catch (err) {
-      console.warn("Live farms API fetch failed, using realistic cluster data:", err);
+      console.warn("Live farms API fetch failed, using multi-cluster realistic dataset:", err);
     } finally {
       setLoading(false);
     }
@@ -184,15 +368,21 @@ export function ClusterMap() {
     loadLiveData();
   }, []);
 
-  // Filter markers based on crop and risk selections
+  // Filter markers based on cluster, crop and risk selections
   const filteredFarms = useMemo(() => {
     return farms.filter((f) => {
+      const matchCluster = selectedCluster === "all" || f.clusterCode === selectedCluster;
       const matchCrop =
-        cropFilter === "all" || f.cropName.toLowerCase().includes(cropFilter.toLowerCase());
+        cropFilter === "all" ||
+        f.cropName.toLowerCase().includes(cropFilter.toLowerCase()) ||
+        (cropFilter === "Pulses" && (f.cropName.includes("Gram") || f.cropName.includes("Chana")));
       const matchRisk = riskFilter === "all" || f.risk === riskFilter;
-      return matchCrop && matchRisk;
+      return matchCluster && matchCrop && matchRisk;
     });
-  }, [farms, cropFilter, riskFilter]);
+  }, [farms, selectedCluster, cropFilter, riskFilter]);
+
+  // Current map center & zoom based on cluster
+  const currentView = clusterCoordinates[selectedCluster] || clusterCoordinates.all;
 
   // Simulate Delay-Risk Index calculation dynamically
   async function handleSimulateDri() {
@@ -202,7 +392,7 @@ export function ClusterMap() {
       const res = await apiDri({
         farmId: selectedFarm.id,
         cropName: selectedFarm.cropName,
-        clusterId: "HUN-01",
+        clusterId: selectedFarm.clusterCode || "HUN-01",
         expectedHarvestDate: selectedFarm.expectedHarvestDate || "2026-12-05",
         soilType: selectedFarm.soilType || "loamy",
         cropPlanId: "d1000000-0000-0000-0000-000000000001",
@@ -210,8 +400,8 @@ export function ClusterMap() {
 
       setSimulationResult({
         verdict: res.verdict || "Stagger recommended",
-        delayDays: res.delayDays ?? 2,
-        recommendedDate: res.recommendedDate || "2026-12-07",
+        delayDays: res.delayDays ?? 3,
+        recommendedDate: res.recommendedDate || "2026-12-08",
       });
 
       // Update selected farm DRI score in state
@@ -235,82 +425,168 @@ export function ClusterMap() {
   return (
     <div className="space-y-4">
       {/* Interactive Controls & Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 backdrop-blur-md">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--foreground)]/70">
-            <Filter className="h-3.5 w-3.5 text-emerald-500" />
-            <span>Crop:</span>
+      <div className="flex flex-col gap-3 rounded-2xl border border-[var(--foreground)]/10 bg-[var(--foreground)]/5 p-3 backdrop-blur-md">
+        {/* Cluster Region Switcher */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--foreground)]/10 pb-2">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--foreground)]/80">
+            <MapPin className="h-4 w-4 text-emerald-500" />
+            <span>Regional Cluster:</span>
           </div>
-          {["all", "Tomato", "Onion", "Chilli"].map((crop) => (
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            {[
+              { id: "all", label: "All Regions (District)" },
+              { id: "HUN-01", label: "Hunasagi (HUN-01)" },
+              { id: "KEM-01", label: "Kembhavi (KEM-01)" },
+              { id: "SHO-01", label: "Shorapur (SHO-01)" },
+            ].map((c) => (
+              <Button
+                key={c.id}
+                variant={selectedCluster === c.id ? "default" : "outline"}
+                size="sm"
+                className={`h-7 text-xs ${selectedCluster === c.id ? "bg-emerald-600 text-white dark:bg-emerald-500" : ""}`}
+                onClick={() => {
+                  setSelectedCluster(c.id);
+                  const firstInCluster = farms.find((f) => c.id === "all" || f.clusterCode === c.id);
+                  if (firstInCluster) setSelectedFarm(firstInCluster);
+                  setSimulationResult(null);
+                }}
+              >
+                {c.label}
+              </Button>
+            ))}
+
             <Button
-              key={crop}
-              variant={cropFilter === crop ? "default" : "outline"}
+              variant="ghost"
               size="sm"
-              className="h-7 text-xs capitalize"
-              onClick={() => setCropFilter(crop)}
+              className="h-7 gap-1 text-xs"
+              onClick={loadLiveData}
+              disabled={loading}
             >
-              {crop === "all" ? "All Crops" : crop}
+              <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
+              Live Sync
             </Button>
-          ))}
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-[var(--foreground)]/70">
-            <span>Risk:</span>
+        {/* Commodity & Risk Filtering + Area Overlays Toggle */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 text-xs font-medium text-[var(--foreground)]/70">
+              <Filter className="h-3.5 w-3.5 text-emerald-500" />
+              <span>Crop:</span>
+            </div>
+            {["all", "Tomato", "Onion", "Cotton", "Pulses", "Paddy"].map((crop) => (
+              <Button
+                key={crop}
+                variant={cropFilter === crop ? "default" : "outline"}
+                size="sm"
+                className="h-7 text-xs capitalize"
+                onClick={() => setCropFilter(crop)}
+              >
+                {crop === "all" ? "All Crops" : crop}
+              </Button>
+            ))}
           </div>
-          {[
-            { key: "all", label: "All" },
-            { key: "high", label: "High Risk", color: "text-red-400" },
-            { key: "med", label: "Medium", color: "text-amber-400" },
-            { key: "low", label: "Low Risk", color: "text-emerald-400" },
-          ].map((r) => (
+
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 text-xs font-medium text-[var(--foreground)]/70">
+              <span>Risk:</span>
+            </div>
+            {[
+              { key: "all", label: "All Risk" },
+              { key: "high", label: "High Risk Area", color: "text-red-400" },
+              { key: "med", label: "Medium", color: "text-amber-400" },
+              { key: "low", label: "Low Risk Safe", color: "text-emerald-400" },
+            ].map((r) => (
+              <Button
+                key={r.key}
+                variant={riskFilter === r.key ? "default" : "outline"}
+                size="sm"
+                className={`h-7 text-xs ${r.color || ""}`}
+                onClick={() => setRiskFilter(r.key)}
+              >
+                {r.label}
+              </Button>
+            ))}
+
             <Button
-              key={r.key}
-              variant={riskFilter === r.key ? "default" : "outline"}
+              variant={showRiskZones ? "default" : "outline"}
               size="sm"
-              className={`h-7 text-xs ${r.color || ""}`}
-              onClick={() => setRiskFilter(r.key)}
+              className={`h-7 gap-1.5 text-xs ${showRiskZones ? "bg-amber-600 text-white hover:bg-amber-700" : ""}`}
+              onClick={() => setShowRiskZones(!showRiskZones)}
             >
-              {r.label}
+              <ShieldAlert className="h-3.5 w-3.5" />
+              Risk Area Zones
             </Button>
-          ))}
 
-          <Button
-            variant={showCatchment ? "secondary" : "outline"}
-            size="sm"
-            className="h-7 gap-1.5 text-xs"
-            onClick={() => setShowCatchment(!showCatchment)}
-          >
-            <Layers className="h-3.5 w-3.5 text-emerald-400" />
-            5km Pooling Radius
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 gap-1 text-xs"
-            onClick={loadLiveData}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin text-emerald-400" : ""}`} />
-            Live Sync
-          </Button>
+            <Button
+              variant={showCatchment ? "secondary" : "outline"}
+              size="sm"
+              className="h-7 gap-1.5 text-xs"
+              onClick={() => setShowCatchment(!showCatchment)}
+            >
+              <Layers className="h-3.5 w-3.5 text-emerald-400" />
+              5km Waste Catchment
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Main Interactive Map */}
-      <div className="relative h-[440px] w-full overflow-hidden rounded-2xl border border-[var(--foreground)]/10 shadow-2xl">
-        <MapContainer center={center} zoom={14} className="h-full w-full" scrollWheelZoom>
+      <div className="relative h-[480px] w-full overflow-hidden rounded-2xl border border-[var(--foreground)]/10 shadow-2xl">
+        <MapContainer center={currentView.center} zoom={currentView.zoom} className="h-full w-full" scrollWheelZoom>
+          <MapController center={currentView.center} zoom={currentView.zoom} />
+
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* Biomass Catchment Radius Layer */}
+          {/* High-Risk vs Low-Risk Geographic Catchment Zones */}
+          {showRiskZones &&
+            geographicRiskZones.map((zone) => (
+              <Circle
+                key={zone.id}
+                center={zone.center}
+                radius={zone.radius}
+                pathOptions={{
+                  color: zone.color,
+                  fillColor: zone.color,
+                  fillOpacity: zone.riskLevel === "high" ? 0.18 : 0.14,
+                  weight: zone.riskLevel === "high" ? 2.5 : 1.5,
+                  dashArray: zone.riskLevel === "high" ? "4, 6" : undefined,
+                }}
+              >
+                <Tooltip direction="center" permanent offset={[0, 0]} opacity={0.9}>
+                  <div className="text-center font-semibold text-xs leading-tight">
+                    <span
+                      className="inline-block rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                      style={{ backgroundColor: zone.color }}
+                    >
+                      {zone.riskLevel === "high" ? "HIGH RISK AREA" : zone.riskLevel === "med" ? "WATCH AREA" : "LOW RISK SAFE ZONE"}
+                    </span>
+                    <div className="mt-1 font-bold">{zone.driRange}</div>
+                    <div className="text-[10px] opacity-75">{zone.dominantCrop} Focus</div>
+                  </div>
+                </Tooltip>
+                <Popup className="text-[var(--foreground)]">
+                  <div className="space-y-1.5 py-1">
+                    <div className="font-bold text-sm" style={{ color: zone.color }}>
+                      {zone.name}
+                    </div>
+                    <p className="text-xs text-[var(--foreground)]/80 leading-relaxed">{zone.description}</p>
+                    <div className="text-xs font-medium">Dominant Crop: {zone.dominantCrop}</div>
+                  </div>
+                </Popup>
+              </Circle>
+            ))}
+
+          {/* Biomass Catchment Radius Layer (Optional) */}
           {showCatchment && (
             <Circle
-              center={center}
-              radius={2200}
+              center={[16.452, 76.448]}
+              radius={2400}
               pathOptions={{
                 color: "#10b981",
                 fillColor: "#10b981",
@@ -320,7 +596,7 @@ export function ClusterMap() {
               }}
             >
               <Tooltip direction="center" permanent offset={[0, 0]} opacity={0.85}>
-                Hunasagi Waste Pooling Catchment (2.2km)
+                5km Biomass Waste Pooling Catchment (14.8t)
               </Tooltip>
             </Circle>
           )}
@@ -330,11 +606,11 @@ export function ClusterMap() {
             <CircleMarker
               key={f.id}
               center={[f.lat, f.lng]}
-              radius={selectedFarm?.id === f.id ? 14 : 10}
+              radius={selectedFarm?.id === f.id ? 14 : 9}
               pathOptions={{
                 color: selectedFarm?.id === f.id ? "#ffffff" : riskColor[f.risk] ?? "#22c55e",
                 fillColor: riskColor[f.risk] ?? "#22c55e",
-                fillOpacity: selectedFarm?.id === f.id ? 0.9 : 0.65,
+                fillOpacity: selectedFarm?.id === f.id ? 0.95 : 0.75,
                 weight: selectedFarm?.id === f.id ? 3 : 1.5,
               }}
               eventHandlers={{
@@ -347,13 +623,13 @@ export function ClusterMap() {
               <Tooltip direction="top" offset={[0, -8]} opacity={1}>
                 <div className="font-semibold">{f.name}</div>
                 <div className="text-xs">
-                  {f.cropName} ({f.variety}) · {f.acres} ac
+                  {f.cropName} ({f.variety}) · {f.acres} ac · {f.clusterCode}
                 </div>
               </Tooltip>
               <Popup className="text-[var(--foreground)]">
                 <div className="space-y-1 py-1">
                   <div className="text-sm font-semibold">{f.name}</div>
-                  <div className="text-xs opacity-80">Farmer: {f.ownerName}</div>
+                  <div className="text-xs opacity-80">Farmer: {f.ownerName} ({f.clusterCode})</div>
                   <div className="text-xs">
                     Crop: <span className="font-medium">{f.cropName}</span> ({f.variety})
                   </div>
@@ -361,7 +637,7 @@ export function ClusterMap() {
                     Soil: <span className="capitalize">{f.soilType}</span> · {f.acres} Acres
                   </div>
                   <div className="mt-2 flex items-center justify-between text-xs">
-                    <span>DRI Risk:</span>
+                    <span>Delay Risk (DRI):</span>
                     <span
                       className="rounded px-1.5 py-0.5 font-bold"
                       style={{ backgroundColor: `${riskColor[f.risk]}33`, color: riskColor[f.risk] }}
@@ -375,113 +651,101 @@ export function ClusterMap() {
           ))}
         </MapContainer>
 
-        {/* Live Status Overlay */}
-        <div className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-2 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/85 px-3 py-2 text-xs backdrop-blur-md">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          <span>
-            Tracking <strong>{filteredFarms.length}</strong> live plots in Hunasagi cluster
-          </span>
+        {/* Live Legend & Status Overlay */}
+        <div className="pointer-events-none absolute bottom-3 left-3 flex flex-col gap-1.5 rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/90 p-2.5 text-xs shadow-lg backdrop-blur-md">
+          <div className="flex items-center gap-2 font-semibold">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            <span>{currentView.label}</span>
+          </div>
+
+          <div className="flex items-center gap-3 pt-1 text-[11px] text-[var(--foreground)]/80">
+            <div className="flex items-center gap-1">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+              <span>High Risk (DRI &gt;60%)</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+              <span>Moderate (35-60%)</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              <span>Low Risk (&lt;35%)</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Interactive Farm Inspector & Live DRI Simulator */}
+      {/* Selected Farm Detail & Live Simulation Panel */}
       {selectedFarm && (
-        <Card glass className="border-emerald-500/20 bg-emerald-500/5">
-          <CardContent className="p-4 sm:p-5">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <div className="space-y-1">
+        <Card glass className="border-emerald-500/20">
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold tracking-tight">{selectedFarm.name}</h3>
+                  <h3 className="text-lg font-semibold">{selectedFarm.name}</h3>
                   <Badge
-                    variant="outline"
-                    className="border-emerald-500/40 text-emerald-600 dark:text-emerald-300"
+                    variant={selectedFarm.risk === "med" ? "gold" : "secondary"}
+                    className={
+                      selectedFarm.risk === "high"
+                        ? "border-red-500/40 bg-red-500/15 text-red-400"
+                        : selectedFarm.risk === "low"
+                        ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400"
+                        : undefined
+                    }
                   >
-                    {selectedFarm.acres} Acres · {selectedFarm.soilType} soil
+                    {selectedFarm.risk.toUpperCase()} RISK · DRI {selectedFarm.driScore}%
                   </Badge>
-                  <span
-                    className="rounded-full px-2 py-0.5 text-xs font-semibold capitalize"
-                    style={{
-                      backgroundColor: `${riskColor[selectedFarm.risk]}25`,
-                      color: riskColor[selectedFarm.risk],
-                    }}
-                  >
-                    {selectedFarm.risk} Risk
-                  </span>
+                  <Badge variant="outline" className="text-xs">
+                    {selectedFarm.clusterCode} · {selectedFarm.village}
+                  </Badge>
                 </div>
-                <p className="text-sm text-[var(--foreground)]/70">
-                  Owner: <strong>{selectedFarm.ownerName}</strong> · Village: {selectedFarm.village} · Status:{" "}
-                  <span className="capitalize text-emerald-600 dark:text-emerald-300">{selectedFarm.status}</span>
+                <p className="mt-1 text-xs text-[var(--foreground)]/70">
+                  Farmer: <span className="font-medium text-[var(--foreground)]">{selectedFarm.ownerName}</span> · {selectedFarm.acres} Acres ({selectedFarm.soilType} soil) · Variety: {selectedFarm.variety}
                 </p>
+                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1 text-[var(--foreground)]/65">
+                    <Calendar className="h-3.5 w-3.5 text-emerald-400" />
+                    Target Harvest: <strong className="text-[var(--foreground)]">{selectedFarm.expectedHarvestDate}</strong>
+                  </span>
+                  {selectedFarm.recommendedHarvestDate && (
+                    <span className="flex items-center gap-1 text-emerald-500">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Optimized Slot: <strong>{selectedFarm.recommendedHarvestDate}</strong>
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   onClick={handleSimulateDri}
                   disabled={driSimulating}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 text-xs py-2"
                 >
                   <Sprout className={`h-4 w-4 ${driSimulating ? "animate-spin" : ""}`} />
-                  {driSimulating ? "Simulating AI Harvest..." : "Simulate Staggered Harvest"}
+                  {driSimulating ? "Computing DRI Stagger..." : "Simulate Staggered Harvest"}
                 </Button>
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-4">
-              <div className="rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/60 p-3">
-                <div className="flex items-center gap-1.5 text-xs text-[var(--foreground)]/60">
-                  <Sprout className="h-3.5 w-3.5 text-emerald-500" />
-                  Active Crop
-                </div>
-                <div className="mt-1 font-semibold">{selectedFarm.cropName}</div>
-                <div className="text-xs text-[var(--foreground)]/50">{selectedFarm.variety}</div>
-              </div>
-
-              <div className="rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/60 p-3">
-                <div className="flex items-center gap-1.5 text-xs text-[var(--foreground)]/60">
-                  <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                  Live DRI Risk Score
-                </div>
-                <div className="mt-1 text-2xl font-bold tabular-nums" style={{ color: riskColor[selectedFarm.risk] }}>
-                  {selectedFarm.driScore}/100
-                </div>
-                <div className="text-xs text-[var(--foreground)]/50">Weather + Peer Saturation</div>
-              </div>
-
-              <div className="rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/60 p-3">
-                <div className="flex items-center gap-1.5 text-xs text-[var(--foreground)]/60">
-                  <Calendar className="h-3.5 w-3.5 text-sky-500" />
-                  Expected Harvest
-                </div>
-                <div className="mt-1 font-semibold tabular-nums">{selectedFarm.expectedHarvestDate}</div>
-                <div className="text-xs text-[var(--foreground)]/50">Base Farmer Schedule</div>
-              </div>
-
-              <div className="rounded-xl border border-[var(--foreground)]/10 bg-[var(--background)]/60 p-3">
-                <div className="flex items-center gap-1.5 text-xs text-[var(--foreground)]/60">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                  AI Recommended Date
-                </div>
-                <div className="mt-1 font-semibold text-emerald-600 dark:text-emerald-300">
-                  {simulationResult?.recommendedDate || selectedFarm.recommendedHarvestDate}
-                </div>
-                <div className="text-xs text-[var(--foreground)]/50">
-                  {simulationResult ? `+${simulationResult.delayDays}d Stagger Delay` : "Synchronized Stagger"}
-                </div>
-              </div>
-            </div>
-
+            {/* Simulation Result Banner */}
             {simulationResult && (
-              <div className="mt-3 flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm">
-                <span className="text-emerald-600 dark:text-emerald-200">
-                  AI Verdict: <strong>{simulationResult.verdict}</strong>. Staggering harvest by{" "}
-                  <strong>{simulationResult.delayDays} days</strong> protects against regional APMC tomato price collapse.
-                </span>
-                <Badge variant="outline" className="border-emerald-500 text-emerald-400">
-                  DRI Computed Live
-                </Badge>
+              <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs">
+                <div className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Stagger Simulation Output for {selectedFarm.name} ({selectedFarm.clusterCode})</span>
+                </div>
+                <p className="mt-1 text-[var(--foreground)]/80 leading-relaxed">
+                  {simulationResult.verdict}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-4 text-xs font-medium">
+                  <span>Calculated Offset: <strong className="text-emerald-500">+{simulationResult.delayDays} Days</strong></span>
+                  <span>Recommended Slot: <strong className="text-emerald-500">{simulationResult.recommendedDate}</strong></span>
+                  <span>New Mitigated DRI: <strong className="text-emerald-500">{selectedFarm.driScore}% (Nominal)</strong></span>
+                </div>
               </div>
             )}
           </CardContent>
