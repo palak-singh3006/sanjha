@@ -187,7 +187,7 @@ export async function GET(req: NextRequest) {
     let query = admin
       .from("crop_plans")
       .select(`
-        id, farm_id, crop_name, sow_date, expected_harvest_date, recommended_harvest_date, status, dri_score, market_pressure, quantity_kg, created_at,
+        id, farm_id, crop_name, sow_date, expected_harvest_date, recommended_harvest_date, status, dri_score, market_pressure, quantity_kg,
         farms (id, name, area_acres, soil_type, cluster_id)
       `)
       .order("expected_harvest_date", { ascending: true })
@@ -220,7 +220,6 @@ export async function GET(req: NextRequest) {
       marketPressure: cp.market_pressure ?? 40,
       estimatedYieldKg: Number(cp.quantity_kg || 0),
       quantityKg: Number(cp.quantity_kg || 0),
-      createdAt: cp.created_at,
     }));
 
     return apiSuccess(results, { meta: { count: results.length } });
